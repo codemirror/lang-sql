@@ -1,4 +1,5 @@
 import dts from "rollup-plugin-dts"
+import {lezer} from "lezer-generator/rollup"
 
 export default [{
   input: "./src/sql.js",
@@ -7,7 +8,8 @@ export default [{
     format: "esm",
     file: "./dist/index.js",
     externalLiveBindings: false
-  }
+  },
+  plugins: [lezer()]
 }, {
   input: "./src/sql.d.ts",
   output: {
