@@ -1,6 +1,6 @@
-import {EditorState} from "@codemirror/next/state"
-import {CompletionContext, CompletionResult, CompletionSource} from "@codemirror/next/autocomplete"
-import {schemaCompletion, PostgreSQL, MySQL, SQLConfig} from "@codemirror/next/lang-sql"
+import {EditorState} from "@codemirror/state"
+import {CompletionContext, CompletionResult, CompletionSource} from "@codemirror/autocomplete"
+import {schemaCompletion, PostgreSQL, MySQL, SQLConfig} from "@codemirror/lang-sql"
 import ist from "ist"
 
 function get(doc: string, conf: SQLConfig & {explicit?: boolean} = {}) {
