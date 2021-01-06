@@ -4,11 +4,14 @@ import {lezer} from "lezer-generator/rollup"
 export default [{
   input: "./src/sql.js",
   external: id => id != "tslib" && !/^(\.?\/|\w:)/.test(id),
-  output: {
+  output: [{
     format: "esm",
     file: "./dist/index.js",
     externalLiveBindings: false
-  },
+  }, {
+    format: "cjs",
+    file: "./dist/index.cjs"
+  }],
   plugins: [lezer()]
 }, {
   input: "./src/sql.d.ts",
