@@ -1,6 +1,6 @@
 {
   "name": "@codemirror/lang-sql",
-  "version": "0.17.1",
+  "version": "0.17.2",
   "description": "SQL language support for the CodeMirror code editor",
   "scripts": {
     "test": "mocha test/test-*.js",
