@@ -239,7 +239,7 @@ export function tokensFor(d: Dialect) {
     } else if (inString(next, d.specialVar)) {
       token.accept(SpecialVar, readWordOrQuoted(input, next2 == next ? pos + 1 : pos))
     } else if (inString(next, d.identifierQuotes)) {
-      token.accept(QuotedIdentifier, readLiteral(input, pos + 1, next, false))
+      token.accept(QuotedIdentifier, readLiteral(input, pos, next, false))
     } else if (next == Ch.Colon || next == Ch.Comma) {
       token.accept(Punctuation, pos)
     } else if (isAlpha(next)) {
