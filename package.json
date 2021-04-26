@@ -3,7 +3,7 @@
   "version": "0.18.0",
   "description": "SQL language support for the CodeMirror code editor",
   "scripts": {
-    "test": "mocha test/test-*.js",
+    "test": "cm-runtests",
     "prepare": "cm-buildhelper src/sql.ts"
   },
   "keywords": [
@@ -33,10 +33,7 @@
     "lezer": "^0.13.0"
   },
   "devDependencies": {
-    "@codemirror/buildhelper": "^0.1.0",
-    "@types/mocha": "^5.2.0",
-    "ist": "^1.1.6",
-    "mocha": "^7.1.1"
+    "@codemirror/buildhelper": "^0.1.5"
   },
   "repository": {
     "type": "git",
