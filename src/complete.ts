@@ -1,7 +1,7 @@
 import {Completion, CompletionContext, CompletionSource, completeFromList, ifNotIn} from "@codemirror/autocomplete"
 import {EditorState} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
-import {SyntaxNode} from "lezer"
+import {SyntaxNode} from "@lezer/common"
 import {Type, Keyword} from "./sql.grammar.terms"
 
 function tokenBefore(tree: SyntaxNode) {
@@ -16,7 +16,7 @@ function stripQuotes(name: string) {
 }
 
 function sourceContext(state: EditorState, startPos: number) {
-  let pos = syntaxTree(state).resolve(startPos, -1)
+  let pos = syntaxTree(state).resolveInner(startPos, -1)
   let empty = false
   if (pos.name == "Identifier" || pos.name == "QuotedIdentifier") {
     empty = false

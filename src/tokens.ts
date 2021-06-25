@@ -1,5 +1,5 @@
-import {ExternalTokenizer, Input} from "lezer"
-import {whitespace, LineComment, BlockComment, String, Number, Bool, Null,
+import {ExternalTokenizer, InputStream} from "@lezer/lr"
+import {whitespace, LineComment, BlockComment, String as StringToken, Number, Bool, Null,
         ParenL, ParenR, BraceL, BraceR, BracketL, BracketR, Semi, Dot,
         Operator, Punctuation, SpecialVar, Identifier, QuotedIdentifier,
         Keyword, Type, Builtin} from "./sql.grammar.terms"
@@ -46,57 +46,54 @@ function isHexDigit(ch: number) {
   return ch >= Ch._0 && ch <= Ch._9 || ch >= Ch.a && ch <= Ch.f || ch >= Ch.A && ch <= Ch.F
 }
 
-function readLiteral(input: Input, pos: number, endQuote: number, backslashEscapes: boolean) {
+function readLiteral(input: InputStream, endQuote: number, backslashEscapes: boolean) {
   for (let escaped = false;;) {
-    let next = input.get(pos++)
-    if (next < 0) return pos - 1
-    if (next == endQuote && !escaped) return pos
-    escaped = backslashEscapes && !escaped && next == Ch.Backslash
+    if (input.next < 0) return
+    if (input.next == endQuote && !escaped) { input.advance(); return }
+    escaped = backslashEscapes && !escaped && input.next == Ch.Backslash
+    input.advance()
   }
 }
 
-function readWord(input: Input, pos: number) {
-  for (;; pos++) {
-    let next = input.get(pos)
-    if (next != Ch.Underscore && !isAlpha(next)) break
+function readWord(input: InputStream) {
+  let result = ""
+  for (;;) {
+    if (input.next != Ch.Underscore && !isAlpha(input.next)) break
+    result += String.fromCharCode(input.next)
+    input.advance()
   }
-  return pos
+  return result
 }
 
-function readWordOrQuoted(input: Input, pos: number) {
-  let next = input.get(pos)
-  if (next == Ch.SingleQuote || next == Ch.DoubleQuote || next == Ch.Backtick)
-    return readLiteral(input, pos + 1, next, false)
-  return readWord(input, pos)
+function readWordOrQuoted(input: InputStream) {
+  if (input.next == Ch.SingleQuote || input.next == Ch.DoubleQuote || input.next == Ch.Backtick) {
+    let quote = input.next
+    input.advance()
+    readLiteral(input, quote, false)
+  } else {
+    readWord(input)
+  }
 }
 
-function readNumber(input: Input, pos: number, sawDot: boolean) {
-  let next
-  for (;; pos++) {
-    next = input.get(pos)
-    if (next == Ch.Dot) {
+function readNumber(input: InputStream, sawDot: boolean) {
+  for (;;) {
+    if (input.next == Ch.Dot) {
       if (sawDot) break
       sawDot = true
-    } else if (next < Ch._0 || next > Ch._9) {
+    } else if (input.next < Ch._0 || input.next > Ch._9) {
       break
     }
+    input.advance()
   }
-  if (next == Ch.E || next == Ch.e) {
-    next = input.get(++pos)
-    if (next == Ch.Plus || next == Ch.Dash) pos++
-    for (;; pos++) {
-      next = input.get(pos)
-      if (next < Ch._0 || next > Ch._9) break
-    }
+  if (input.next == Ch.E || input.next == Ch.e) {
+    input.advance()
+    if ((input as any).next == Ch.Plus || (input as any).next == Ch.Dash) input.advance()
+    while (input.next >= Ch._0 && input.next <= Ch._9) input.advance()
   }
-  return pos
 }
 
-function eol(input: Input, pos: number) {
-  for (;; pos++) {
-    let next = input.get(pos)
-    if (next < 0 || next == Ch.Newline) return pos
-  }
+function eol(input: InputStream) {
+  while (!(input.next < 0 || input.next == Ch.Newline)) input.advance()
 }
 
 function inString(ch: number, str: string) {
@@ -154,97 +151,110 @@ export function dialect(spec: Partial<Dialect>, kws?: string, types?: string, bu
 }
 
 export function tokensFor(d: Dialect) {
-  return new ExternalTokenizer((input, token) => {
-    let pos = token.start, next = input.get(pos++), next2 = input.get(pos)
-    if (inString(next, Space)) {
-      while (inString(input.get(pos), Space)) pos++
-      token.accept(whitespace, pos)
+  return new ExternalTokenizer(input => {
+    let {next} = input
+    input.advance()
+    if (inString(input.next, Space)) {
+      while (inString(input.next, Space)) input.advance()
+      input.acceptToken(whitespace)
     } else if (next == Ch.SingleQuote || next == Ch.DoubleQuote && d.doubleQuotedStrings) {
-      token.accept(String, readLiteral(input, pos, next, d.backslashEscapes))
+      readLiteral(input, next, d.backslashEscapes)
+      input.acceptToken(StringToken)
     } else if (next == Ch.Hash && d.hashComments ||
-               next == Ch.Slash && next2 == Ch.Slash && d.slashComments) {
-      token.accept(LineComment, eol(input, pos))
-    } else if (next == Ch.Dash && next2 == Ch.Dash &&
-               (!d.spaceAfterDashes || input.get(pos + 1) == Ch.Space)) {
-      token.accept(LineComment, eol(input, pos + 1))
-    } else if (next == Ch.Slash && next2 == Ch.Star) {
-      pos++
+               next == Ch.Slash && input.next == Ch.Slash && d.slashComments) {
+      eol(input)
+      input.acceptToken(LineComment)
+    } else if (next == Ch.Dash && input.next == Ch.Dash &&
+               (!d.spaceAfterDashes || input.peek(2) == Ch.Space)) {
+      eol(input)
+      input.acceptToken(LineComment)
+    } else if (next == Ch.Slash && input.next == Ch.Star) {
+      input.advance()
       for (let prev = -1, depth = 1;;) {
-        let next = input.get(pos++)
-        if (next < 0) {
-          pos--
-          break
-        } else if (prev == Ch.Star && next == Ch.Slash) {
+        if (input.next < 0) break
+        input.advance()
+        if (prev == Ch.Star && (input as any).next == Ch.Slash) {
           depth--
           if (!depth) break
-          next = -1
-        } else if (prev == Ch.Slash && next == Ch.Star) {
+          prev = -1
+        } else if (prev == Ch.Slash && input.next == Ch.Star) {
           depth++
-          next = -1
+          prev = -1
+        } else {
+          prev = input.next
         }
-        prev = next
       }
-      token.accept(BlockComment, pos)
-    } else if ((next == Ch.e || next == Ch.E) && next2 == Ch.SingleQuote) {
-      token.accept(String, readLiteral(input, pos + 1, Ch.SingleQuote, true))
-    } else if ((next == Ch.n || next == Ch.N) && next2 == Ch.SingleQuote &&
+      input.acceptToken(BlockComment)
+    } else if ((next == Ch.e || next == Ch.E) && input.next == Ch.SingleQuote) {
+      input.advance()
+      readLiteral(input, Ch.SingleQuote, true)
+    } else if ((next == Ch.n || next == Ch.N) && input.next == Ch.SingleQuote &&
                d.charSetCasts) {
-      token.accept(String, readLiteral(input, pos + 1, Ch.SingleQuote, d.backslashEscapes))
+      input.advance()
+      readLiteral(input, Ch.SingleQuote, d.backslashEscapes)
+      input.acceptToken(StringToken)
     } else if (next == Ch.Underscore && d.charSetCasts) {
-      for (;;) {
-        let next = input.get(pos++)
-        if (next == Ch.SingleQuote && pos > token.start + 2) {
-          token.accept(String, readLiteral(input, pos, Ch.SingleQuote, d.backslashEscapes))
+      for (let i = 0;; i++) {
+        if (input.next == Ch.SingleQuote && i > 1) {
+          input.advance()
+          readLiteral(input, Ch.SingleQuote, d.backslashEscapes)
+          input.acceptToken(StringToken)
           break
         }
-        if (!isAlpha(next)) break
+        if (!isAlpha(input.next)) break
+        input.advance()
       }
     } else if (next == Ch.ParenL) {
-      token.accept(ParenL, pos)
+      input.acceptToken(ParenL)
     } else if (next == Ch.ParenR) {
-      token.accept(ParenR, pos)
+      input.acceptToken(ParenR)
     } else if (next == Ch.BraceL) {
-      token.accept(BraceL, pos)
+      input.acceptToken(BraceL)
     } else if (next == Ch.BraceR) {
-      token.accept(BraceR, pos)
+      input.acceptToken(BraceR)
     } else if (next == Ch.BracketL) {
-      token.accept(BracketL, pos)
+      input.acceptToken(BracketL)
     } else if (next == Ch.BracketR) {
-      token.accept(BracketR, pos)
+      input.acceptToken(BracketR)
     } else if (next == Ch.Semi) {
-      token.accept(Semi, pos)
-    } else if (next == Ch._0 && (next2 == Ch.b || next2 == Ch.B) ||
-               (next == Ch.b || next == Ch.B) && next2 == Ch.SingleQuote) {
-      let quoted = next2 == Ch.SingleQuote
-      pos++
-      while ((next = input.get(pos)) == Ch._0 || next == Ch._1) pos++
-      if (quoted && next == Ch.SingleQuote) pos++
-      token.accept(Number, pos)
-    } else if (next == Ch._0 && (next2 == Ch.x || next2 == Ch.X) ||
-               (next == Ch.x || next == Ch.X) && next2 == Ch.SingleQuote) {
-      let quoted = next2 == Ch.SingleQuote
-      pos++
-      while (isHexDigit(next = input.get(pos))) pos++
-      if (quoted && next == Ch.SingleQuote) pos++
-      token.accept(Number, pos)
-    } else if (next == Ch.Dot && next2 >= Ch._0 && next2 <= Ch._9) {
-      token.accept(Number, readNumber(input, pos + 1, true))
+      input.acceptToken(Semi)
+    } else if (next == Ch._0 && (input.next == Ch.b || input.next == Ch.B) ||
+               (next == Ch.b || next == Ch.B) && input.next == Ch.SingleQuote) {
+      let quoted = input.next == Ch.SingleQuote
+      input.advance()
+      while ((input as any).next == Ch._0 || (input as any).next == Ch._1) input.advance()
+      if (quoted && input.next == Ch.SingleQuote) input.advance()
+      input.acceptToken(Number)
+    } else if (next == Ch._0 && (input.next == Ch.x || input.next == Ch.X) ||
+               (next == Ch.x || next == Ch.X) && input.next == Ch.SingleQuote) {
+      let quoted = input.next == Ch.SingleQuote
+      input.advance()
+      while (isHexDigit(input.next)) input.advance()
+      if (quoted && input.next == Ch.SingleQuote) input.advance()
+      input.acceptToken(Number)
+    } else if (next == Ch.Dot && input.next >= Ch._0 && input.next <= Ch._9) {
+      readNumber(input, true)
+      input.acceptToken(Number)
     } else if (next == Ch.Dot) {
-      token.accept(Dot, pos)
+      input.acceptToken(Dot)
     } else if (next >= Ch._0 && next <= Ch._9) {
-      token.accept(Number, readNumber(input, pos, false))
+      readNumber(input, false)
+      input.acceptToken(Number)
     } else if (inString(next, d.operatorChars)) {
-      while (inString(input.get(pos), d.operatorChars)) pos++
-      token.accept(Operator, pos)
+      while (inString(input.next, d.operatorChars)) input.advance()
+      input.acceptToken(Operator)
     } else if (inString(next, d.specialVar)) {
-      token.accept(SpecialVar, readWordOrQuoted(input, next2 == next ? pos + 1 : pos))
+      if (input.next == next) input.advance()
+      readWordOrQuoted(input)
+      input.acceptToken(SpecialVar)
     } else if (inString(next, d.identifierQuotes)) {
-      token.accept(QuotedIdentifier, readLiteral(input, pos, next, false))
+      readLiteral(input, next, false)
+      input.acceptToken(QuotedIdentifier)
     } else if (next == Ch.Colon || next == Ch.Comma) {
-      token.accept(Punctuation, pos)
+      input.acceptToken(Punctuation)
     } else if (isAlpha(next)) {
-      pos = readWord(input, pos)
-      token.accept(d.words[input.read(token.start, pos).toLowerCase()] ?? Identifier, pos)
+      let word = readWord(input)
+      input.acceptToken(d.words[word.toLowerCase()] ?? Identifier)
     }
   })
 }
