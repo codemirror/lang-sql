@@ -55,11 +55,12 @@ function readLiteral(input: InputStream, endQuote: number, backslashEscapes: boo
   }
 }
 
-function readWord(input: InputStream) {
-  let result = ""
+function readWord(input: InputStream): void
+function readWord(input: InputStream, result: string): string
+function readWord(input: InputStream, result?: string) {
   for (;;) {
     if (input.next != Ch.Underscore && !isAlpha(input.next)) break
-    result += String.fromCharCode(input.next)
+    if (result != null) result += String.fromCharCode(input.next)
     input.advance()
   }
   return result
@@ -253,7 +254,7 @@ export function tokensFor(d: Dialect) {
     } else if (next == Ch.Colon || next == Ch.Comma) {
       input.acceptToken(Punctuation)
     } else if (isAlpha(next)) {
-      let word = readWord(input)
+      let word = readWord(input, String.fromCharCode(next))
       input.acceptToken(d.words[word.toLowerCase()] ?? Identifier)
     }
   })
