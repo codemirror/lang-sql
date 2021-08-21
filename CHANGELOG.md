@@ -1,3 +1,9 @@
+## 0.19.3 (2021-08-21)
+
+### Bug fixes
+
+Fix a bug that broke tokenization of keywords.
+
 ## 0.19.2 (2021-08-11)
 
 ## 0.19.1 (2021-08-11)
