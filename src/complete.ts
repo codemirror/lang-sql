@@ -4,18 +4,18 @@ import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "@lezer/common"
 import {Type, Keyword} from "./sql.grammar.terms"
 
-function tokenBefore(tree: SyntaxNode) {
+export function tokenBefore(tree: SyntaxNode) {
   let cursor = tree.cursor.moveTo(tree.from, -1)
   while (/Comment/.test(cursor.name)) cursor.moveTo(cursor.from, -1)
   return cursor.node
 }
 
-function stripQuotes(name: string) {
+export function stripQuotes(name: string) {
   let quoted = /^[`'"](.*)[`'"]$/.exec(name)
   return quoted ? quoted[1] : name
 }
 
-function sourceContext(state: EditorState, startPos: number) {
+export function sourceContext(state: EditorState, startPos: number) {
   let pos = syntaxTree(state).resolveInner(startPos, -1)
   let empty = false
   if (pos.name == "Identifier" || pos.name == "QuotedIdentifier") {

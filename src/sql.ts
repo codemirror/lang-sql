@@ -5,6 +5,7 @@ import {styleTags, tags as t} from "@codemirror/highlight"
 import {parser as baseParser} from "./sql.grammar"
 import {tokens, Dialect, tokensFor, SQLKeywords, SQLTypes, dialect} from "./tokens"
 import {completeFromSchema, completeKeywords} from "./complete"
+export * from './complete'
 
 let parser = baseParser.configure({
   props: [
