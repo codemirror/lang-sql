@@ -1,3 +1,11 @@
+## 0.19.4 (2021-10-28)
+
+### Bug fixes
+
+Remove duplicate keywords/types in dialect configurations.
+
+Fix a bug that caused characters directly before a space to be tokenized incorrectly.
+
 ## 0.19.3 (2021-08-21)
 
 ### Bug fixes
