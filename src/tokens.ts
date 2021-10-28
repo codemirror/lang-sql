@@ -155,7 +155,7 @@ export function tokensFor(d: Dialect) {
   return new ExternalTokenizer(input => {
     let {next} = input
     input.advance()
-    if (inString(input.next, Space)) {
+    if (inString(next, Space)) {
       while (inString(input.next, Space)) input.advance()
       input.acceptToken(whitespace)
     } else if (next == Ch.SingleQuote || next == Ch.DoubleQuote && d.doubleQuotedStrings) {
