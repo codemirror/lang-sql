@@ -25,7 +25,7 @@ function sourceContext(state: EditorState, startPos: number) {
     if (dot && dot.name == ".") {
       let before = tokenBefore(dot)
       if (before && before.name == "Identifier" || before.name == "QuotedIdentifier")
-        parent = stripQuotes(state.sliceDoc(before.from, before.to).toLowerCase())
+        parent = stripQuotes(state.sliceDoc(before.from, before.to))
     }
     return {parent,
             from: pos.from,
@@ -33,7 +33,7 @@ function sourceContext(state: EditorState, startPos: number) {
   } else if (pos.name == ".") {
     let before = tokenBefore(pos)
     if (before && before.name == "Identifier" || before.name == "QuotedIdentifier")
-      return {parent: stripQuotes(state.sliceDoc(before.from, before.to).toLowerCase()),
+      return {parent: stripQuotes(state.sliceDoc(before.from, before.to)),
               from: startPos,
               quoted: null}
   } else {
