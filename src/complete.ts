@@ -5,7 +5,7 @@ import {SyntaxNode} from "@lezer/common"
 import {Type, Keyword} from "./sql.grammar.terms"
 
 function tokenBefore(tree: SyntaxNode) {
-  let cursor = tree.cursor.moveTo(tree.from, -1)
+  let cursor = tree.cursor().moveTo(tree.from, -1)
   while (/Comment/.test(cursor.name)) cursor.moveTo(cursor.from, -1)
   return cursor.node
 }

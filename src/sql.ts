@@ -1,7 +1,7 @@
 import {continuedIndent, indentNodeProp, foldNodeProp, LRLanguage, LanguageSupport} from "@codemirror/language"
 import {Extension} from "@codemirror/state"
 import {Completion} from "@codemirror/autocomplete"
-import {styleTags, tags as t} from "@codemirror/highlight"
+import {styleTags, tags as t} from "@lezer/highlight"
 import {parser as baseParser} from "./sql.grammar"
 import {tokens, Dialect, tokensFor, SQLKeywords, SQLTypes, dialect} from "./tokens"
 import {completeFromSchema, completeKeywords} from "./complete"
