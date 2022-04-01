@@ -74,7 +74,7 @@ export function completeFromSchema(schema: {[table: string]: readonly (string | 
       from,
       to: quoteAfter ? context.pos + 1 : undefined,
       options: maybeQuoteCompletions(quoted, options),
-      span: quoted ? QuotedSpan : Span
+      validFor: quoted ? QuotedSpan : Span
     }
   }
 }
