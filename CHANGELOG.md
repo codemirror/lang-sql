@@ -1,3 +1,9 @@
+## 0.20.0 (2022-04-20)
+
+### Bug fixes
+
+Fix autocompletion on columns when the table name is written with upper-case letters. Move to @lezer/highlight
+
 ## 0.19.4 (2021-10-28)
 
 ### Bug fixes
