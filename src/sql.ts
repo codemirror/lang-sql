@@ -71,8 +71,7 @@ type SQLDialectSpec = {
 
 /// Represents an SQL dialect.
 export class SQLDialect {
-  /// @internal
-  constructor(
+  private constructor(
     /// @internal
     readonly dialect: Dialect,
     /// The language for this dialect.
