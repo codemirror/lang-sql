@@ -36,5 +36,5 @@ to communication around the project.
 @Cassandra
 @PLSQL
 
-@keywordCompletion
-@schemaCompletion
+@keywordCompletionSource
+@schemaCompletionSource

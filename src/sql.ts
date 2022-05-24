@@ -1,6 +1,6 @@
 import {continuedIndent, indentNodeProp, foldNodeProp, LRLanguage, LanguageSupport} from "@codemirror/language"
 import {Extension} from "@codemirror/state"
-import {Completion} from "@codemirror/autocomplete"
+import {Completion, CompletionSource} from "@codemirror/autocomplete"
 import {styleTags, tags as t} from "@lezer/highlight"
 import {parser as baseParser} from "./sql.grammar"
 import {tokens, Dialect, tokensFor, SQLKeywords, SQLTypes, dialect} from "./tokens"
@@ -117,19 +117,29 @@ export interface SQLConfig {
   upperCaseKeywords?: boolean
 }
 
-/// Returns an extension that enables keyword completion for the given
-/// SQL dialect.
+/// Returns a completion source that provides keyword completion for
+/// the given SQL dialect.
+export function keywordCompletionSource(dialect: SQLDialect, upperCase = false): CompletionSource {
+  return completeKeywords(dialect.dialect.words, upperCase)
+}
+
+/// FIXME remove on 1.0 @internal
 export function keywordCompletion(dialect: SQLDialect, upperCase = false): Extension {
   return dialect.language.data.of({
-    autocomplete: completeKeywords(dialect.dialect.words, upperCase)
+    autocomplete: keywordCompletionSource(dialect, upperCase)
   })
 }
 
-/// Returns an extension that enables schema-based completion for the
-/// given configuration.
+/// Returns a completion sources that provides schema-based completion
+/// for the given configuration.
+export function schemaCompletionSource(config: SQLConfig): CompletionSource {
+  return config.schema ? completeFromSchema(config.schema, config.tables, config.defaultTable) : () => null
+}
+
+/// FIXME remove on 1.0 @internal
 export function schemaCompletion(config: SQLConfig): Extension {
   return config.schema ? (config.dialect || StandardSQL).language.data.of({
-    autocomplete: completeFromSchema(config.schema, config.tables, config.defaultTable)
+    autocomplete: schemaCompletion(config)
   }) : []
 }
 

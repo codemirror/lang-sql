@@ -20,6 +20,7 @@ conduct](http://contributor-covenant.org/version/1/1/0/) that applies
 to communication around the project.
 
 ## API Reference
+
 <dl>
 <dt id="user-content-sql">
   <code><strong><a href="#user-content-sql">sql</a></strong>(<a id="user-content-sql^config" href="#user-content-sql^config">config</a>&#8288;?: <a href="#user-content-sqlconfig">SQLConfig</a> = {}) → <a href="https://codemirror.net/6/docs/ref#language.LanguageSupport">LanguageSupport</a></code></dt>
@@ -30,7 +31,7 @@ extensions.</p>
 </dd>
 <dt id="user-content-sqlconfig">
   <h4>
-    interface
+    <code>interface</code>
     <a href="#user-content-sqlconfig">SQLConfig</a></h4>
 </dt>
 
@@ -66,13 +67,13 @@ directly at the top level.</p>
 </dd>
 <dt id="user-content-sqldialect">
   <h4>
-    class
+    <code>class</code>
     <a href="#user-content-sqldialect">SQLDialect</a></h4>
 </dt>
 
 <dd><p>Represents an SQL dialect.</p>
 <dl><dt id="user-content-sqldialect.language">
-  <code><strong><a href="#user-content-sqldialect.language">language</a></strong>: <a href="https://codemirror.net/6/docs/ref#language.LezerLanguage">LezerLanguage</a></code></dt>
+  <code><strong><a href="#user-content-sqldialect.language">language</a></strong>: <a href="https://codemirror.net/6/docs/ref#language.LRLanguage">LRLanguage</a></code></dt>
 
 <dd><p>The language for this dialect.</p>
 </dd><dt id="user-content-sqldialect.extension">
@@ -184,16 +185,16 @@ Server</a>.</p>
 
 <dd><p><a href="https://en.wikipedia.org/wiki/PL/SQL">PL/SQL</a> dialect.</p>
 </dd>
-<dt id="user-content-keywordcompletion">
-  <code><strong><a href="#user-content-keywordcompletion">keywordCompletion</a></strong>(<a id="user-content-keywordcompletion^dialect" href="#user-content-keywordcompletion^dialect">dialect</a>: <a href="#user-content-sqldialect">SQLDialect</a>, <a id="user-content-keywordcompletion^uppercase" href="#user-content-keywordcompletion^uppercase">upperCase</a>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a> = false) → <a href="https://codemirror.net/6/docs/ref#state.Extension">Extension</a></code></dt>
+<dt id="user-content-keywordcompletionsource">
+  <code><strong><a href="#user-content-keywordcompletionsource">keywordCompletionSource</a></strong>(<a id="user-content-keywordcompletionsource^dialect" href="#user-content-keywordcompletionsource^dialect">dialect</a>: <a href="#user-content-sqldialect">SQLDialect</a>, <a id="user-content-keywordcompletionsource^uppercase" href="#user-content-keywordcompletionsource^uppercase">upperCase</a>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a> = false) → <a href="https://codemirror.net/6/docs/ref#autocomplete.CompletionSource">CompletionSource</a></code></dt>
 
-<dd><p>Returns an extension that enables keyword completion for the given
-SQL dialect.</p>
+<dd><p>Returns a completion source that provides keyword completion for
+the given SQL dialect.</p>
 </dd>
-<dt id="user-content-schemacompletion">
-  <code><strong><a href="#user-content-schemacompletion">schemaCompletion</a></strong>(<a id="user-content-schemacompletion^config" href="#user-content-schemacompletion^config">config</a>: <a href="#user-content-sqlconfig">SQLConfig</a>) → <a href="https://codemirror.net/6/docs/ref#state.Extension">Extension</a></code></dt>
+<dt id="user-content-schemacompletionsource">
+  <code><strong><a href="#user-content-schemacompletionsource">schemaCompletionSource</a></strong>(<a id="user-content-schemacompletionsource^config" href="#user-content-schemacompletionsource^config">config</a>: <a href="#user-content-sqlconfig">SQLConfig</a>) → <a href="https://codemirror.net/6/docs/ref#autocomplete.CompletionSource">CompletionSource</a></code></dt>
 
-<dd><p>Returns an extension that enables schema-based completion for the
-given configuration.</p>
+<dd><p>Returns a completion sources that provides schema-based completion
+for the given configuration.</p>
 </dd>
 </dl>
