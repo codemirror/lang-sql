@@ -1,3 +1,9 @@
+## 0.20.2 (2022-05-24)
+
+### Bug fixes
+
+Fix an infinite recursion bug in `schemaCompletionSource`.
+
 ## 0.20.1 (2022-05-24)
 
 ### Breaking changes
