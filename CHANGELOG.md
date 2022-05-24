@@ -1,3 +1,9 @@
+## 0.20.1 (2022-05-24)
+
+### Breaking changes
+
+The `schemaCompletion` and `keywordCompletion` exports, which returned extensions, have been replaced with `schemaCompletionSource` and `keywordCompletionSource`, which return completion sources. The old exports will remain available until the next major version.
+
 ## 0.20.0 (2022-04-20)
 
 ### Bug fixes
