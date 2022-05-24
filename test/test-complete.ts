@@ -1,15 +1,17 @@
 import {EditorState} from "@codemirror/state"
 import {CompletionContext, CompletionResult, CompletionSource} from "@codemirror/autocomplete"
-import {schemaCompletion, PostgreSQL, MySQL, SQLConfig} from "@codemirror/lang-sql"
+import {schemaCompletionSource, PostgreSQL, MySQL, SQLConfig} from "@codemirror/lang-sql"
 import ist from "ist"
 
 function get(doc: string, conf: SQLConfig & {explicit?: boolean} = {}) {
-  let cur = doc.indexOf("|")
+  let cur = doc.indexOf("|"), dialect = conf.dialect || PostgreSQL
   doc = doc.slice(0, cur) + doc.slice(cur + 1)
   let state = EditorState.create({
     doc,
     selection: {anchor: cur},
-    extensions: [conf.dialect || PostgreSQL, schemaCompletion(Object.assign({dialect: PostgreSQL}, conf))]
+    extensions: [dialect, dialect.language.data.of({
+      autocomplete: schemaCompletionSource(Object.assign({dialect}, conf))
+    })]
   })
   let result = state.languageDataAt<CompletionSource>("autocomplete", cur)[0](new CompletionContext(state, cur, !!conf.explicit))
   return result as CompletionResult | null

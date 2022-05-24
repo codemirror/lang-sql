@@ -139,7 +139,7 @@ export function schemaCompletionSource(config: SQLConfig): CompletionSource {
 /// FIXME remove on 1.0 @internal
 export function schemaCompletion(config: SQLConfig): Extension {
   return config.schema ? (config.dialect || StandardSQL).language.data.of({
-    autocomplete: schemaCompletion(config)
+    autocomplete: schemaCompletionSource(config)
   }) : []
 }
 
