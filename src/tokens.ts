@@ -176,7 +176,7 @@ export function tokensFor(d: Dialect) {
         input.advance()
         if (prev == Ch.Star && (input as any).next == Ch.Slash) {
           depth--
-          if (!depth) break
+          if (!depth) { input.advance(); break }
           prev = -1
         } else if (prev == Ch.Slash && input.next == Ch.Star) {
           depth++
