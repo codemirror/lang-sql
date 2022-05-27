@@ -29,6 +29,11 @@ let schema1 = {
   products: ["name", "cost", "description"]
 }
 
+let schema2 = {
+  "public.users": ["email", "id"],
+  "other.users": ["name", "id"]
+}
+
 describe("SQL completion", () => {
   it("completes table names", () => {
     ist(str(get("select u|", {schema: schema1})), "products, users")
@@ -36,6 +41,18 @@ describe("SQL completion", () => {
 
   it("completes quoted table names", () => {
     ist(str(get('select "u|', {schema: schema1})), '"products", "users"')
+  })
+
+  it("completes table names under schema", () => {
+    ist(str(get("select public.u|", {schema: schema2})), "users")
+  })
+
+  it("completes quoted table names under schema", () => {
+    ist(str(get('select public."u|', {schema: schema2})), '"users"')
+  })
+
+  it("completes quoted table names under quoted schema", () => {
+    ist(str(get('select "public"."u|', {schema: schema2})), '"users"')
   })
 
   it("completes column names", () => {
@@ -48,6 +65,31 @@ describe("SQL completion", () => {
 
   it("completes column names in quoted tables", () => {
     ist(str(get('select "users".|', {schema: schema1})), "address, id, name")
+  })
+
+  it("completes column names in tables for a specific schema", () => {
+    ist(str(get("select public.users.|", {schema: schema2})), "email, id")
+    ist(str(get("select other.users.|", {schema: schema2})), "id, name")
+  })
+
+  it("completes quoted column names in tables for a specific schema", () => {
+    ist(str(get('select public.users."|', {schema: schema2})), '"email", "id"')
+    ist(str(get('select other.users."|', {schema: schema2})), '"id", "name"')
+  })
+
+  it("completes column names in quoted tables for a specific schema", () => {
+    ist(str(get('select public."users".|', {schema: schema2})), "email, id")
+    ist(str(get('select other."users".|', {schema: schema2})), "id, name")
+  })
+
+  it("completes column names in quoted tables for a specific quoted schema", () => {
+    ist(str(get('select "public"."users".|', {schema: schema2})), "email, id")
+    ist(str(get('select "other"."users".|', {schema: schema2})), "id, name")
+  })
+
+  it("completes quoted column names in quoted tables for a specific quoted schema", () => {
+    ist(str(get('select "public"."users"."|', {schema: schema2})), '"email", "id"')
+    ist(str(get('select "other"."users"."|', {schema: schema2})), '"id", "name"')
   })
 
   it("includes closing quote in completion", () => {
