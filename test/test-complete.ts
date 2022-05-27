@@ -55,7 +55,7 @@ describe("SQL completion", () => {
     ist(str(get('select "users".|', {schema: schema1})), "address, id, name")
   })
 
-  it("complets column names in tables for a specific schema", () => {
+  it("completes column names in tables for a specific schema", () => {
     ist(str(get("select public.users.|", {schema: schema2})), "email, id")
     ist(str(get("select other.users.|", {schema: schema2})), "id, name")
   })
