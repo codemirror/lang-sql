@@ -1,3 +1,9 @@
+## 0.20.3 (2022-05-27)
+
+### Bug fixes
+
+Fix a bug where the slash at the end of block comments wasn't considered part of the comment token.
+
 ## 0.20.2 (2022-05-24)
 
 ### Bug fixes
