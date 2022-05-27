@@ -24,18 +24,49 @@ function sourceContext(state: EditorState, startPos: number) {
     let dot = tokenBefore(pos)
     if (dot && dot.name == ".") {
       let before = tokenBefore(dot)
-      if (before && before.name == "Identifier" || before.name == "QuotedIdentifier")
-        parent = stripQuotes(state.sliceDoc(before.from, before.to))
+      if (before && before.name == "Identifier" || before.name == "QuotedIdentifier") {
+        let table = stripQuotes(state.sliceDoc(before.from, before.to))
+        let schema = null
+        let dot = tokenBefore(before)
+        if (dot && dot.name == ".") {
+          let before = tokenBefore(dot)
+
+          if (before) {
+            let value = stripQuotes(state.sliceDoc(before.from, before.to))
+
+            if (before.name == "Identifier" || before.name == "QuotedIdentifier" || (before.name == "Keyword" && value.toLowerCase() == "public"))
+              schema = value
+          }
+        }
+
+        parent = schema ? `${schema}.${table}` : table
+      }
     }
     return {parent,
             from: pos.from,
             quoted: pos.name == "QuotedIdentifier" ? state.sliceDoc(pos.from, pos.from + 1) : null}
   } else if (pos.name == ".") {
     let before = tokenBefore(pos)
-    if (before && before.name == "Identifier" || before.name == "QuotedIdentifier")
-      return {parent: stripQuotes(state.sliceDoc(before.from, before.to)),
+    if (before && before.name == "Identifier" || before.name == "QuotedIdentifier") {
+      let table = stripQuotes(state.sliceDoc(before.from, before.to))
+      let schema = null
+      let dot = tokenBefore(before)
+
+      if (dot && dot.name == ".") {
+        let before = tokenBefore(dot)
+
+        if (before) {
+          let value = stripQuotes(state.sliceDoc(before.from, before.to))
+
+          if (before.name == "Identifier" || before.name == "QuotedIdentifier" || (before.name == "Keyword" && value.toLowerCase() == "public"))
+            schema = value
+        }
+      }
+
+      return {parent: schema ? `${schema}.${table}` : table,
               from: startPos,
               quoted: null}
+    }
   } else {
     empty = true
   }
