@@ -15,6 +15,25 @@ function stripQuotes(name: string) {
   return quoted ? quoted[1] : name
 }
 
+function schemaBefore(state: EditorState, tree: SyntaxNode) {
+  let dot = tokenBefore(tree)
+
+  if (dot && dot.name == ".") {
+    let schema = tokenBefore(dot)
+
+    if (schema) {
+      let value = stripQuotes(state.sliceDoc(schema.from, schema.to)).toLowerCase()
+
+      // Handle a case when a "public" schema is specified, which also counts as a SQL keyword
+      if (schema.name == "Identifier" || schema.name == "QuotedIdentifier" || (schema.name == "Keyword" && value == "public")) {
+        return schema
+      }
+    }
+  }
+
+  return null
+}
+
 function sourceContext(state: EditorState, startPos: number) {
   let pos = syntaxTree(state).resolveInner(startPos, -1)
   let empty = false
@@ -26,20 +45,9 @@ function sourceContext(state: EditorState, startPos: number) {
       let before = tokenBefore(dot)
       if (before && before.name == "Identifier" || before.name == "QuotedIdentifier") {
         let table = stripQuotes(state.sliceDoc(before.from, before.to))
-        let schema = null
-        let dot = tokenBefore(before)
-        if (dot && dot.name == ".") {
-          let before = tokenBefore(dot)
-
-          if (before) {
-            let value = stripQuotes(state.sliceDoc(before.from, before.to))
-
-            if (before.name == "Identifier" || before.name == "QuotedIdentifier" || (before.name == "Keyword" && value.toLowerCase() == "public"))
-              schema = value
-          }
-        }
-
-        parent = schema ? `${schema}.${table}` : table
+        let schema = schemaBefore(state, before)
+        let schemaName = schema ? stripQuotes(state.sliceDoc(schema.from, schema.to)) : null
+        parent = schemaName ? `${schemaName}.${table}` : table
       }
     }
     return {parent,
@@ -49,21 +57,10 @@ function sourceContext(state: EditorState, startPos: number) {
     let before = tokenBefore(pos)
     if (before && before.name == "Identifier" || before.name == "QuotedIdentifier") {
       let table = stripQuotes(state.sliceDoc(before.from, before.to))
-      let schema = null
-      let dot = tokenBefore(before)
+      let schema = schemaBefore(state, before)
+      let schemaName = schema ? stripQuotes(state.sliceDoc(schema.from, schema.to)) : null
 
-      if (dot && dot.name == ".") {
-        let before = tokenBefore(dot)
-
-        if (before) {
-          let value = stripQuotes(state.sliceDoc(before.from, before.to))
-
-          if (before.name == "Identifier" || before.name == "QuotedIdentifier" || (before.name == "Keyword" && value.toLowerCase() == "public"))
-            schema = value
-        }
-      }
-
-      return {parent: schema ? `${schema}.${table}` : table,
+      return {parent: schemaName ? `${schemaName}.${table}` : table,
               from: startPos,
               quoted: null}
     }
