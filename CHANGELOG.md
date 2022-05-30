@@ -1,3 +1,9 @@
+## 0.20.4 (2022-05-30)
+
+### New features
+
+Schema completion descriptions may now include dots in table names to indicate nested schemas.
+
 ## 0.20.3 (2022-05-27)
 
 ### Bug fixes
