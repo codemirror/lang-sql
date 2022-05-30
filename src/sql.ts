@@ -102,8 +102,9 @@ export interface SQLConfig {
   /// The [dialect](#lang-sql.SQLDialect) to use. Defaults to
   /// [`StandardSQL`](#lang-sql.StandardSQL).
   dialect?: SQLDialect,
-  /// An object that maps table names to options (columns) that can
-  /// be completed for that table. Use lower-case names here.
+  /// An object that maps table names, optionally prefixed with a
+  /// schema name (`"schema.table"`) to options (columns) that can be
+  /// completed for that table. Use lower-case names here.
   schema?: {[table: string]: readonly (string | Completion)[]},
   /// By default, the completions for the table names will be
   /// generated from the `schema` object. But if you want to
@@ -113,6 +114,9 @@ export interface SQLConfig {
   /// When given, columns from the named table can be completed
   /// directly at the top level.
   defaultTable?: string,
+  /// When given, tables prefixed with this schema name can be
+  /// completed directly at the top level.
+  defaultSchema?: string,
   /// When set to true, keyword completions will be upper-case.
   upperCaseKeywords?: boolean
 }

@@ -15,61 +15,35 @@ function stripQuotes(name: string) {
   return quoted ? quoted[1] : name
 }
 
-function isIdentifier(state: EditorState, node: SyntaxNode) {
-  let value = stripQuotes(state.sliceDoc(node.from, node.to)).toLowerCase()
-
+function isIdentifierOrSchema(state: EditorState, node: SyntaxNode) {
   // Handle a case when a "public" schema is specified, which also counts as a SQL keyword
-  return node.name == "Identifier" || node.name == "QuotedIdentifier" || (node.name == "Keyword" && value == "public")  
+  return node.name == "Identifier" || node.name == "QuotedIdentifier" ||
+    (node.name == "Keyword" && /^public$/i.test(state.sliceDoc(node.from, node.to)))
 }
 
-function schemaBefore(state: EditorState, tree: SyntaxNode) {
-  let dot = tokenBefore(tree)
-
-  if (dot && dot.name == ".") {
-    let schema = tokenBefore(dot)
-
-    if (schema && isIdentifier(state, schema)) {
-      return schema
-    }
+function parentsFor(state: EditorState, node: SyntaxNode | null) {
+  for (let path = [];;) {
+    if (!node || node.name != ".") return path
+    let name = tokenBefore(node)
+    if (!name || !isIdentifierOrSchema(state, name)) return path
+    path.unshift(stripQuotes(state.sliceDoc(name.from, name.to)))
+    node = tokenBefore(name)
   }
-
-  return null
 }
 
 function sourceContext(state: EditorState, startPos: number) {
   let pos = syntaxTree(state).resolveInner(startPos, -1)
-  let empty = false
-  if (isIdentifier(state, pos)) {
-    empty = false
-    let parent = null
-    let dot = tokenBefore(pos)
-    if (dot && dot.name == ".") {
-      let before = tokenBefore(dot)
-      if (before && isIdentifier(state, before)) {
-        let table = stripQuotes(state.sliceDoc(before.from, before.to))
-        let schema = schemaBefore(state, before)
-        let schemaName = schema ? stripQuotes(state.sliceDoc(schema.from, schema.to)) : null
-        parent = schemaName ? `${schemaName}.${table}` : table
-      }
-    }
-    return {parent,
-            from: pos.from,
-            quoted: pos.name == "QuotedIdentifier" ? state.sliceDoc(pos.from, pos.from + 1) : null}
-  } else if (pos.name == ".") {
-    let before = tokenBefore(pos)
-    if (before && isIdentifier(state, before)) {
-      let table = stripQuotes(state.sliceDoc(before.from, before.to))
-      let schema = schemaBefore(state, before)
-      let schemaName = schema ? stripQuotes(state.sliceDoc(schema.from, schema.to)) : null
-
-      return {parent: schemaName ? `${schemaName}.${table}` : table,
-              from: startPos,
-              quoted: null}
-    }
+  if (pos.name == "Identifier" || pos.name == "QuotedIdentifier") {
+    return {from: pos.from,
+            quoted: pos.name == "QuotedIdentifier" ? state.sliceDoc(pos.from, pos.from + 1) : null,
+            parents: parentsFor(state, tokenBefore(pos))}
+  } if (pos.name == ".") {
+    return {from: startPos,
+            quoted: null,
+            parents: parentsFor(state, pos)}
   } else {
-    empty = true
+    return {from: startPos, quoted: null, parents: [], empty: true}
   }
-  return {parent: null, from: startPos, quoted: null, empty}
 }
 
 function maybeQuoteCompletions(quote: string | null, completions: readonly Completion[]) {
@@ -79,46 +53,56 @@ function maybeQuoteCompletions(quote: string | null, completions: readonly Compl
 
 const Span = /^\w*$/, QuotedSpan = /^[`'"]?\w*[`'"]?$/
 
-export function completeFromSchema(schema: {[table: string]: readonly (string | Completion)[]},
-                                   tables?: readonly Completion[],
-                                   defaultTable?: string): CompletionSource {
-  let bySchema: {[schema: string]: readonly Completion[]} = Object.create(null)
-  let byTable: {[table: string]: readonly Completion[]} = Object.create(null)
+class CompletionLevel {
+  list: readonly Completion[] = []
+  children: {[name: string]: CompletionLevel} | undefined = undefined
 
-  for (let table in schema) {
-    if (table.includes(".")) {
-      let [schemaName, tableName] = table.split(".")
-
-      if (!Array.isArray(bySchema[schemaName])) {
-        bySchema[schemaName] = []
-      }
-
-      bySchema[schemaName].push({label: tableName, type: "type"})
-    }
-
-    byTable[table] = schema[table].map(val => {
-      return typeof val == "string" ? {label: val, type: "property"} : val    
-    })
+  child(name: string) {
+    let children = this.children || (this.children = Object.create(null))
+    return children[name] || (children[name] = new CompletionLevel)
   }
 
-  let topOptions: readonly Completion[] =
-    (tables || Object.keys(byTable).map(name => ({label: name, type: "type"} as Completion)))
-    .concat(defaultTable && byTable[defaultTable] || [])
+  childCompletions(type: string) {
+    return this.children ? Object.keys(this.children).filter(x => x).map(name => ({label: name, type} as Completion)) : []
+  }
+}
+
+export function completeFromSchema(schema: {[table: string]: readonly (string | Completion)[]},
+                                   tables?: readonly Completion[],
+                                   defaultTableName?: string, defaultSchemaName?: string): CompletionSource {
+  let top = new CompletionLevel
+  let defaultSchema = top.child(defaultSchemaName || "")
+  for (let table in schema) {
+    let dot = table.indexOf(".")
+    let schemaCompletions = dot > -1 ? top.child(table.slice(0, dot)) : defaultSchema
+    let tableCompletions = schemaCompletions.child(dot > -1 ? table.slice(dot + 1) : table)
+    tableCompletions.list = schema[table].map(val => typeof val == "string" ? {label: val, type: "property"} : val)
+  }
+  defaultSchema.list = (tables || defaultSchema.childCompletions("type"))
+                         .concat(defaultTableName ? defaultSchema.child(defaultTableName).list : [])
+  for (let sName in top.children) {
+    let schema = top.child(sName)
+    if (!schema.list.length) schema.list = schema.childCompletions("type")
+  }
+  top.list = defaultSchema.list.concat(top.childCompletions("type"))
 
   return (context: CompletionContext) => {
-    let {parent, from, quoted, empty} = sourceContext(context.state, context.pos)
+    let {parents, from, quoted, empty} = sourceContext(context.state, context.pos)
     if (empty && !context.explicit) return null
-    let options = topOptions
-    if (parent) {
-      let completions = bySchema[parent] || byTable[parent]
-      if (!completions) return null
-      options = completions
+    let level = top
+    for (let name of parents) {
+      while (!level.children || !level.children[name]) {
+        if (level == top) level = defaultSchema
+        else if (level == defaultSchema && defaultTableName) level = level.child(defaultTableName)
+        else return null
+      }
+      level = level.child(name)
     }
     let quoteAfter = quoted && context.state.sliceDoc(context.pos, context.pos + 1) == quoted
     return {
       from,
       to: quoteAfter ? context.pos + 1 : undefined,
-      options: maybeQuoteCompletions(quoted, options),
+      options: maybeQuoteCompletions(quoted, level.list),
       validFor: quoted ? QuotedSpan : Span
     }
   }
