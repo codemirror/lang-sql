@@ -43,6 +43,18 @@ describe("SQL completion", () => {
     ist(str(get('select "u|', {schema: schema1})), '"products", "users"')
   })
 
+  it("completes table names under schema", () => {
+    ist(str(get("select public.u|", {schema: schema2})), "users")
+  })
+
+  it("completes quoted table names under schema", () => {
+    ist(str(get('select public."u|', {schema: schema2})), '"users"')
+  })
+
+  it("completes quoted table names under quoted schema", () => {
+    ist(str(get('select "public"."u|', {schema: schema2})), '"users"')
+  })
+
   it("completes column names", () => {
     ist(str(get("select users.|", {schema: schema1})), "address, id, name")
   })
