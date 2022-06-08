@@ -1,3 +1,9 @@
+## 6.0.0 (2022-06-08)
+
+### Breaking changes
+
+Update dependencies to 6.0.0
+
 ## 0.20.4 (2022-05-30)
 
 ### New features
