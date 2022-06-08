@@ -137,7 +137,8 @@ export function keywordCompletion(dialect: SQLDialect, upperCase = false): Exten
 /// Returns a completion sources that provides schema-based completion
 /// for the given configuration.
 export function schemaCompletionSource(config: SQLConfig): CompletionSource {
-  return config.schema ? completeFromSchema(config.schema, config.tables, config.defaultTable) : () => null
+  return config.schema ? completeFromSchema(config.schema, config.tables, config.defaultTable, config.defaultSchema)
+    : () => null
 }
 
 /// FIXME remove on 1.0 @internal

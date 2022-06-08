@@ -2,14 +2,14 @@
 
 # @codemirror/lang-sql [![NPM version](https://img.shields.io/npm/v/@codemirror/lang-sql.svg)](https://www.npmjs.org/package/@codemirror/lang-sql)
 
-[ [**WEBSITE**](https://codemirror.net/6/) | [**ISSUES**](https://github.com/codemirror/codemirror.next/issues) | [**FORUM**](https://discuss.codemirror.net/c/next/) | [**CHANGELOG**](https://github.com/codemirror/lang-sql/blob/main/CHANGELOG.md) ]
+[ [**WEBSITE**](https://codemirror.net/) | [**ISSUES**](https://github.com/codemirror/codemirror.next/issues) | [**FORUM**](https://discuss.codemirror.net/c/next/) | [**CHANGELOG**](https://github.com/codemirror/lang-sql/blob/main/CHANGELOG.md) ]
 
 This package implements SQL language support for the
-[CodeMirror](https://codemirror.net/6/) code editor.
+[CodeMirror](https://codemirror.net/) code editor.
 
-The [project page](https://codemirror.net/6/) has more information, a
-number of [examples](https://codemirror.net/6/examples/) and the
-[documentation](https://codemirror.net/6/docs/).
+The [project page](https://codemirror.net/) has more information, a
+number of [examples](https://codemirror.net/examples/) and the
+[documentation](https://codemirror.net/docs/).
 
 This code is released under an
 [MIT license](https://github.com/codemirror/lang-sql/tree/main/LICENSE).
@@ -23,7 +23,7 @@ to communication around the project.
 
 <dl>
 <dt id="user-content-sql">
-  <code><strong><a href="#user-content-sql">sql</a></strong>(<a id="user-content-sql^config" href="#user-content-sql^config">config</a>&#8288;?: <a href="#user-content-sqlconfig">SQLConfig</a> = {}) → <a href="https://codemirror.net/6/docs/ref#language.LanguageSupport">LanguageSupport</a></code></dt>
+  <code><strong><a href="#user-content-sql">sql</a></strong>(<a id="user-content-sql^config" href="#user-content-sql^config">config</a>&#8288;?: <a href="#user-content-sqlconfig">SQLConfig</a> = {}) → <a href="https://codemirror.net/docs/ref#language.LanguageSupport">LanguageSupport</a></code></dt>
 
 <dd><p>SQL language support for the given SQL dialect, with keyword
 completion, and, if provided, schema-based completion as extra
@@ -42,12 +42,12 @@ extensions.</p>
 <dd><p>The <a href="#user-content-sqldialect">dialect</a> to use. Defaults to
 <a href="#user-content-standardsql"><code>StandardSQL</code></a>.</p>
 </dd><dt id="user-content-sqlconfig.schema">
-  <code><strong><a href="#user-content-sqlconfig.schema">schema</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>&lt;readonly (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://codemirror.net/6/docs/ref#autocomplete.Completion">Completion</a>)[]&gt;</code></dt>
+  <code><strong><a href="#user-content-sqlconfig.schema">schema</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>&lt;readonly (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>)[]&gt;</code></dt>
 
 <dd><p>An object that maps table names to options (columns) that can
 be completed for that table. Use lower-case names here.</p>
 </dd><dt id="user-content-sqlconfig.tables">
-  <code><strong><a href="#user-content-sqlconfig.tables">tables</a></strong>&#8288;?: readonly <a href="https://codemirror.net/6/docs/ref#autocomplete.Completion">Completion</a>[]</code></dt>
+  <code><strong><a href="#user-content-sqlconfig.tables">tables</a></strong>&#8288;?: readonly <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>[]</code></dt>
 
 <dd><p>By default, the completions for the table names will be
 generated from the <code>schema</code> object. But if you want to
@@ -73,11 +73,11 @@ directly at the top level.</p>
 
 <dd><p>Represents an SQL dialect.</p>
 <dl><dt id="user-content-sqldialect.language">
-  <code><strong><a href="#user-content-sqldialect.language">language</a></strong>: <a href="https://codemirror.net/6/docs/ref#language.LRLanguage">LRLanguage</a></code></dt>
+  <code><strong><a href="#user-content-sqldialect.language">language</a></strong>: <a href="https://codemirror.net/docs/ref#language.LRLanguage">LRLanguage</a></code></dt>
 
 <dd><p>The language for this dialect.</p>
 </dd><dt id="user-content-sqldialect.extension">
-  <code><strong><a href="#user-content-sqldialect.extension">extension</a></strong>: <a href="https://codemirror.net/6/docs/ref#state.Extension">Extension</a></code></dt>
+  <code><strong><a href="#user-content-sqldialect.extension">extension</a></strong>: <a href="https://codemirror.net/docs/ref#state.Extension">Extension</a></code></dt>
 
 <dd><p>Returns the language for this dialect as an extension.</p>
 </dd><dt id="user-content-sqldialect^define">
@@ -186,13 +186,13 @@ Server</a>.</p>
 <dd><p><a href="https://en.wikipedia.org/wiki/PL/SQL">PL/SQL</a> dialect.</p>
 </dd>
 <dt id="user-content-keywordcompletionsource">
-  <code><strong><a href="#user-content-keywordcompletionsource">keywordCompletionSource</a></strong>(<a id="user-content-keywordcompletionsource^dialect" href="#user-content-keywordcompletionsource^dialect">dialect</a>: <a href="#user-content-sqldialect">SQLDialect</a>, <a id="user-content-keywordcompletionsource^uppercase" href="#user-content-keywordcompletionsource^uppercase">upperCase</a>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a> = false) → <a href="https://codemirror.net/6/docs/ref#autocomplete.CompletionSource">CompletionSource</a></code></dt>
+  <code><strong><a href="#user-content-keywordcompletionsource">keywordCompletionSource</a></strong>(<a id="user-content-keywordcompletionsource^dialect" href="#user-content-keywordcompletionsource^dialect">dialect</a>: <a href="#user-content-sqldialect">SQLDialect</a>, <a id="user-content-keywordcompletionsource^uppercase" href="#user-content-keywordcompletionsource^uppercase">upperCase</a>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a> = false) → <a href="https://codemirror.net/docs/ref#autocomplete.CompletionSource">CompletionSource</a></code></dt>
 
 <dd><p>Returns a completion source that provides keyword completion for
 the given SQL dialect.</p>
 </dd>
 <dt id="user-content-schemacompletionsource">
-  <code><strong><a href="#user-content-schemacompletionsource">schemaCompletionSource</a></strong>(<a id="user-content-schemacompletionsource^config" href="#user-content-schemacompletionsource^config">config</a>: <a href="#user-content-sqlconfig">SQLConfig</a>) → <a href="https://codemirror.net/6/docs/ref#autocomplete.CompletionSource">CompletionSource</a></code></dt>
+  <code><strong><a href="#user-content-schemacompletionsource">schemaCompletionSource</a></strong>(<a id="user-content-schemacompletionsource^config" href="#user-content-schemacompletionsource^config">config</a>: <a href="#user-content-sqlconfig">SQLConfig</a>) → <a href="https://codemirror.net/docs/ref#autocomplete.CompletionSource">CompletionSource</a></code></dt>
 
 <dd><p>Returns a completion sources that provides schema-based completion
 for the given configuration.</p>
