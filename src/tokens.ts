@@ -172,7 +172,7 @@ export function tokensFor(d: Dialect) {
     } else if (next == Ch.Dollar && input.next == Ch.Dollar) {
       readDoubleDollarLiteral(input)
       input.acceptToken(StringToken)
-    }  else if (next == Ch.SingleQuote || next == Ch.DoubleQuote && d.doubleQuotedStrings) {
+    } else if (next == Ch.SingleQuote || next == Ch.DoubleQuote && d.doubleQuotedStrings) {
       readLiteral(input, next, d.backslashEscapes)
       input.acceptToken(StringToken)
     } else if (next == Ch.Hash && d.hashComments ||
