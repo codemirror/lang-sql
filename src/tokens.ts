@@ -9,6 +9,7 @@ const enum Ch {
   Space = 32,
   DoubleQuote = 34,
   Hash = 35,
+  Dollar = 36,
   SingleQuote = 39,
   ParenL = 40, ParenR = 41,
   Star = 42,
@@ -51,6 +52,14 @@ function readLiteral(input: InputStream, endQuote: number, backslashEscapes: boo
     if (input.next < 0) return
     if (input.next == endQuote && !escaped) { input.advance(); return }
     escaped = backslashEscapes && !escaped && input.next == Ch.Backslash
+    input.advance()
+  }
+}
+
+function readDoubleDollarLiteral(input: InputStream) {
+  for (;;) {
+    if (input.next < 0 || input.peek(1) < 0) return
+    if (input.next == Ch.Dollar && input.peek(1) == Ch.Dollar ) { input.advance(2); return }
     input.advance()
   }
 }
@@ -120,6 +129,7 @@ export interface Dialect {
   spaceAfterDashes: boolean,
   slashComments: boolean,
   doubleQuotedStrings: boolean,
+  doubleDollarStrings: boolean,
   charSetCasts: boolean,
   operatorChars: string,
   specialVar: string,
@@ -136,6 +146,7 @@ const defaults: Dialect = {
   spaceAfterDashes: false,
   slashComments: false,
   doubleQuotedStrings: false,
+  doubleDollarStrings: false,
   charSetCasts: false,
   operatorChars: "*+\-%<>!=&|~^/",
   specialVar: "?",
@@ -158,7 +169,10 @@ export function tokensFor(d: Dialect) {
     if (inString(next, Space)) {
       while (inString(input.next, Space)) input.advance()
       input.acceptToken(whitespace)
-    } else if (next == Ch.SingleQuote || next == Ch.DoubleQuote && d.doubleQuotedStrings) {
+    } else if (next == Ch.Dollar && input.next == Ch.Dollar) {
+      readDoubleDollarLiteral(input)
+      input.acceptToken(StringToken)
+    }  else if (next == Ch.SingleQuote || next == Ch.DoubleQuote && d.doubleQuotedStrings) {
       readLiteral(input, next, d.backslashEscapes)
       input.acceptToken(StringToken)
     } else if (next == Ch.Hash && d.hashComments ||
