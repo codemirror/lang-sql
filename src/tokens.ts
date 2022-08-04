@@ -169,7 +169,7 @@ export function tokensFor(d: Dialect) {
     if (inString(next, Space)) {
       while (inString(input.next, Space)) input.advance()
       input.acceptToken(whitespace)
-    } else if (next == Ch.Dollar && input.next == Ch.Dollar) {
+    } else if (next == Ch.Dollar && input.next == Ch.Dollar && d.doubleDollarStrings) {
       readDoubleDollarLiteral(input)
       input.acceptToken(StringToken)
     } else if (next == Ch.SingleQuote || next == Ch.DoubleQuote && d.doubleQuotedStrings) {
