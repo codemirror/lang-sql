@@ -2,14 +2,14 @@
 
 # @codemirror/lang-sql [![NPM version](https://img.shields.io/npm/v/@codemirror/lang-sql.svg)](https://www.npmjs.org/package/@codemirror/lang-sql)
 
-[ [**WEBSITE**](https://codemirror.net/) | [**ISSUES**](https://github.com/codemirror/dev/issues) | [**FORUM**](https://discuss.codemirror.net/c/next/) | [**CHANGELOG**](https://github.com/codemirror/lang-sql/blob/main/CHANGELOG.md) ]
+[ [**WEBSITE**](https://codemirror.net/6/) | [**ISSUES**](https://github.com/codemirror/dev/issues) | [**FORUM**](https://discuss.codemirror.net/c/next/) | [**CHANGELOG**](https://github.com/codemirror/lang-sql/blob/main/CHANGELOG.md) ]
 
 This package implements SQL language support for the
-[CodeMirror](https://codemirror.net/) code editor.
+[CodeMirror](https://codemirror.net/6/) code editor.
 
-The [project page](https://codemirror.net/) has more information, a
-number of [examples](https://codemirror.net/examples/) and the
-[documentation](https://codemirror.net/docs/).
+The [project page](https://codemirror.net/6/) has more information, a
+number of [examples](https://codemirror.net/6/examples/) and the
+[documentation](https://codemirror.net/6/docs/).
 
 This code is released under an
 [MIT license](https://github.com/codemirror/lang-sql/tree/main/LICENSE).
@@ -44,8 +44,9 @@ extensions.</p>
 </dd><dt id="user-content-sqlconfig.schema">
   <code><strong><a href="#user-content-sqlconfig.schema">schema</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>&lt;readonly (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>)[]&gt;</code></dt>
 
-<dd><p>An object that maps table names to options (columns) that can
-be completed for that table. Use lower-case names here.</p>
+<dd><p>An object that maps table names, optionally prefixed with a
+schema name (<code>&quot;schema.table&quot;</code>) to options (columns) that can be
+completed for that table. Use lower-case names here.</p>
 </dd><dt id="user-content-sqlconfig.tables">
   <code><strong><a href="#user-content-sqlconfig.tables">tables</a></strong>&#8288;?: readonly <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>[]</code></dt>
 
@@ -58,6 +59,11 @@ this option.</p>
 
 <dd><p>When given, columns from the named table can be completed
 directly at the top level.</p>
+</dd><dt id="user-content-sqlconfig.defaultschema">
+  <code><strong><a href="#user-content-sqlconfig.defaultschema">defaultSchema</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
+
+<dd><p>When given, tables prefixed with this schema name can be
+completed directly at the top level.</p>
 </dd><dt id="user-content-sqlconfig.uppercasekeywords">
   <code><strong><a href="#user-content-sqlconfig.uppercasekeywords">upperCaseKeywords</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
@@ -116,6 +122,11 @@ directly at the top level.</p>
 
 <dd><p>When enabled <code>--</code> comments are only recognized when there's a
 space after the dashes.</p>
+</dd><dt id="user-content-sqldialect^define^spec.doubledollarquotedstrings">
+  <code><strong><a href="#user-content-sqldialect^define^spec.doubledollarquotedstrings">doubleDollarQuotedStrings</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+
+<dd><p>When enabled, things quoted with &quot;$&quot; are treated as
+strings, rather than identifiers.</p>
 </dd><dt id="user-content-sqldialect^define^spec.doublequotedstrings">
   <code><strong><a href="#user-content-sqldialect^define^spec.doublequotedstrings">doubleQuotedStrings</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
