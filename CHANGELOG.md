@@ -1,3 +1,9 @@
+## 6.1.0 (2022-08-05)
+
+### New features
+
+The new `doubleDollarQuotedStrings` options to SQL dialects allows parsing of text delimited by `$$` as strings. Regenerate readme
+
 ## 6.0.0 (2022-06-08)
 
 ### Breaking changes
