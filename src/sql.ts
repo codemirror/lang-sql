@@ -19,6 +19,8 @@ let parser = baseParser.configure({
       Keyword: t.keyword,
       Type: t.typeName,
       Builtin: t.standard(t.name),
+      Bits: t.number,
+      Bytes: t.string,
       Bool: t.bool,
       Null: t.null,
       Number: t.number,
@@ -70,6 +72,12 @@ type SQLDialectSpec = {
   /// The characters that can be used to quote identifiers. Defaults
   /// to `"\""`.
   identifierQuotes?: string
+  /// Controls whether bit values can be defined as 0b1010. Defaults
+  /// to false.
+  unquotedBitLiterals?: boolean,
+  // Controls whether bit values can contain other characters than 0 and 1.
+  // Defaults to false.
+  treatBitsAsBytes?: boolean,
 }
 
 /// Represents an SQL dialect.
@@ -183,6 +191,7 @@ export const MySQL = SQLDialect.define({
   operatorChars: "*+-%<>!=&|^",
   charSetCasts: true,
   doubleQuotedStrings: true,
+  unquotedBitLiterals: true,
   hashComments: true,
   spaceAfterDashes: true,
   specialVar: "@?",
@@ -198,6 +207,7 @@ export const MariaSQL = SQLDialect.define({
   operatorChars: "*+-%<>!=&|^",
   charSetCasts: true,
   doubleQuotedStrings: true,
+  unquotedBitLiterals: true,
   hashComments: true,
   spaceAfterDashes: true,
   specialVar: "@?",

@@ -1,5 +1,5 @@
 import {ExternalTokenizer, InputStream} from "@lezer/lr"
-import {whitespace, LineComment, BlockComment, String as StringToken, Number, Bool, Null,
+import {whitespace, LineComment, BlockComment, String as StringToken, Number, Bits, Bytes, Bool, Null,
         ParenL, ParenR, BraceL, BraceR, BracketL, BracketR, Semi, Dot,
         Operator, Punctuation, SpecialVar, Identifier, QuotedIdentifier,
         Keyword, Type, Builtin} from "./sql.grammar.terms"
@@ -85,6 +85,11 @@ function readWordOrQuoted(input: InputStream) {
   }
 }
 
+function readBits(input: InputStream, endQuote?: number) {
+  while ((input as any).next == Ch._0 || (input as any).next == Ch._1) input.advance()
+  if (endQuote && input.next == endQuote) input.advance()
+}
+
 function readNumber(input: InputStream, sawDot: boolean) {
   for (;;) {
     if (input.next == Ch.Dot) {
@@ -130,6 +135,8 @@ export interface Dialect {
   slashComments: boolean,
   doubleQuotedStrings: boolean,
   doubleDollarStrings: boolean,
+  unquotedBitLiterals: boolean,
+  treatBitsAsBytes: boolean,
   charSetCasts: boolean,
   operatorChars: string,
   specialVar: string,
@@ -147,6 +154,8 @@ const defaults: Dialect = {
   slashComments: false,
   doubleQuotedStrings: false,
   doubleDollarStrings: false,
+  unquotedBitLiterals: false,
+  treatBitsAsBytes: false,
   charSetCasts: false,
   operatorChars: "*+\-%<>!=&|~^/",
   specialVar: "?",
@@ -233,13 +242,20 @@ export function tokensFor(d: Dialect) {
       input.acceptToken(BracketR)
     } else if (next == Ch.Semi) {
       input.acceptToken(Semi)
-    } else if (next == Ch._0 && (input.next == Ch.b || input.next == Ch.B) ||
-               (next == Ch.b || next == Ch.B) && input.next == Ch.SingleQuote) {
-      let quoted = input.next == Ch.SingleQuote
+    } else if (d.unquotedBitLiterals && next == Ch._0 && input.next == Ch.b) {
       input.advance()
-      while ((input as any).next == Ch._0 || (input as any).next == Ch._1) input.advance()
-      if (quoted && input.next == Ch.SingleQuote) input.advance()
-      input.acceptToken(Number)
+      readBits(input)
+      input.acceptToken(Bits)
+    } else if ((next == Ch.b || next == Ch.B) && (input.next == Ch.SingleQuote || input.next == Ch.DoubleQuote)) {
+      const quoteStyle = input.next
+      input.advance()
+      if (d.treatBitsAsBytes) {
+        readLiteral(input, quoteStyle, d.backslashEscapes)
+        input.acceptToken(Bytes)
+      } else {
+        readBits(input, quoteStyle)
+        input.acceptToken(Bits)
+      }
     } else if (next == Ch._0 && (input.next == Ch.x || input.next == Ch.X) ||
                (next == Ch.x || next == Ch.X) && input.next == Ch.SingleQuote) {
       let quoted = input.next == Ch.SingleQuote
