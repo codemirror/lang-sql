@@ -14,6 +14,8 @@ element {
   Null |
   Identifier |
   QuotedIdentifier |
+  Bits |
+  Bytes |
   Builtin |
   SpecialVar |
   CompositeIdentifier {
@@ -51,6 +53,8 @@ element {
   QuotedIdentifier
   Keyword
   Type
+  Bits
+  Bytes
   Builtin
 }
 
