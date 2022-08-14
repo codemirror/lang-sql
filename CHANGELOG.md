@@ -1,3 +1,11 @@
+## 6.2.0 (2022-08-14)
+
+### New features
+
+The new `unquotedBitLiterals` dialect option controls whether `0b01` syntax is recognized.
+
+Dialects now allow a `treatBitsAsBytes` option to allow any characters inside quoted strings prefixed with `b`.
+
 ## 6.1.0 (2022-08-05)
 
 ### New features
