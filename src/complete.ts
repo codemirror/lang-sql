@@ -36,7 +36,7 @@ function sourceContext(state: EditorState, startPos: number) {
   if (pos.name == "Identifier" || pos.name == "QuotedIdentifier") {
     return {from: pos.from,
             quoted: pos.name == "QuotedIdentifier" ? state.sliceDoc(pos.from, pos.from + 1) : null,
-            parents: parentsFor(state, tokenBefore(pos))}
+            parents: resolveAlias(state, pos, parentsFor(state, tokenBefore(pos)))}
   } if (pos.name == ".") {
     return {from: startPos,
             quoted: null,
