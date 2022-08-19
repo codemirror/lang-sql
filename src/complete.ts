@@ -40,10 +40,38 @@ function sourceContext(state: EditorState, startPos: number) {
   } if (pos.name == ".") {
     return {from: startPos,
             quoted: null,
-            parents: parentsFor(state, pos)}
+            parents: resolveAlias(state, pos, parentsFor(state, pos))}
   } else {
     return {from: startPos, quoted: null, parents: [], empty: true}
   }
+}
+
+function resolveAlias(state: EditorState, node: SyntaxNode, parents: string[]): string[] {
+  if (parents.length === 1) {
+    const aliasName = parents[0];
+    // node.parent because the alias is referenced within a child (clause)
+    for (let searchNode = findFromClause(state, node.parent)?.nextSibling; searchNode != null && !isKeyword(state, searchNode, "WHERE"); searchNode = searchNode.nextSibling) {
+      if ((searchNode.name == "Identifier" || searchNode.name == "QuotedIdentifier") && stripQuotes(state.sliceDoc(searchNode.from, searchNode.to)) === aliasName) {
+        let sourceNode = isKeyword(state, searchNode.prevSibling, "AS") ? searchNode.prevSibling.prevSibling : searchNode.prevSibling;
+        if (sourceNode?.name.endsWith("Identifier")) { // can be Identifier, QuotedIdentifier or CompositeIdentifier
+          return state.sliceDoc(sourceNode.from, sourceNode.to).split(".").map(stripQuotes);
+        }
+      }
+    }
+  }
+  return parents;
+}
+
+function findFromClause(state: EditorState, node: SyntaxNode): SyntaxNode {
+  for (let searchNode = node.parent.firstChild; searchNode != null; searchNode = searchNode.nextSibling) {
+    if (isKeyword(state, searchNode, "FROM"))
+      return searchNode;
+  }
+  return null;
+}
+
+function isKeyword(state: EditorState, node: SyntaxNode, keyword: string): boolean {
+  return node.name == "Keyword" && state.sliceDoc(node.from, node.to).toUpperCase() === keyword.toUpperCase();
 }
 
 function maybeQuoteCompletions(quote: string | null, completions: readonly Completion[]) {
