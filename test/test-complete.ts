@@ -92,6 +92,32 @@ describe("SQL completion", () => {
     ist(str(get('select "other"."users"."|', {schema: schema2})), '"id", "name"')
   })
 
+  it("completes column names of aliased tables", () => {
+    ist(str(get("select u.| FROM users u", {schema: schema1})), "address, id, name")
+    ist(str(get("select u.| FROM users as u", {schema: schema1})), "address, id, name")
+    ist(str(get("select * FROM users u WHERE u.|", {schema: schema1})), "address, id, name")
+    ist(str(get("select * FROM users as u WHERE u.|", {schema: schema1})), "address, id, name")
+  })
+
+  it("completes column names of aliased quoted tables", () => {
+    ist(str(get('select u.| FROM "users" u', {schema: schema1})), "address, id, name")
+    ist(str(get('select u.| FROM "users" as u', {schema: schema1})), "address, id, name")
+    ist(str(get('select * FROM "users" u WHERE u.|', {schema: schema1})), "address, id, name")
+    ist(str(get('select * FROM "users" as u WHERE u.|', {schema: schema1})), "address, id, name")
+  })
+
+  it("completes column names of aliased tables for a specific schema", () => {
+    ist(str(get("select u.| FROM public.users u", {schema: schema2})), "email, id")
+  })
+
+  it("completes column names in aliased quoted tables for a specific schema", () => {
+    ist(str(get('select u.| FROM public."users" u', {schema: schema2})), "email, id")
+  })
+
+  it("completes column names in aliased quoted tables for a specific quoted schema", () => {
+    ist(str(get('select u.| FROM "public"."users" u', {schema: schema2})), "email, id")
+  })
+
   it("includes closing quote in completion", () => {
     let r = get('select "u|"', {schema: schema1})
     ist(r!.to, 10)
