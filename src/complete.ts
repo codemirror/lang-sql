@@ -53,7 +53,7 @@ function resolveAlias(state: EditorState, node: SyntaxNode, parents: string[]): 
     for (let searchNode = findFromClause(state, node.parent)?.nextSibling; searchNode != null && !isKeyword(state, searchNode, "WHERE"); searchNode = searchNode.nextSibling) {
       if ((searchNode.name == "Identifier" || searchNode.name == "QuotedIdentifier") && stripQuotes(state.sliceDoc(searchNode.from, searchNode.to)) === aliasName) {
         let sourceNode = isKeyword(state, searchNode.prevSibling, "AS") ? searchNode.prevSibling.prevSibling : searchNode.prevSibling;
-        if (sourceNode?.name.endsWith("Identifier")) { // can be Identifier, QuotedIdentifier or CompositeIdentifier
+        if (sourceNode && /Identifier$/.test(sourceNode.name)) { // can be Identifier, QuotedIdentifier or CompositeIdentifier
           return state.sliceDoc(sourceNode.from, sourceNode.to).split(".").map(stripQuotes);
         }
       }
