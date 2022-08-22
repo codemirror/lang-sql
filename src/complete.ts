@@ -10,9 +10,10 @@ function tokenBefore(tree: SyntaxNode) {
   return cursor.node
 }
 
-function stripQuotes(name: string) {
-  let quoted = /^[`'"](.*)[`'"]$/.exec(name)
-  return quoted ? quoted[1] : name
+function textUnquoted(state: EditorState, node: SyntaxNode): string {
+  const textMaybeQuoted = state.sliceDoc(node.from, node.to)
+  const matches = /^([`'"])(.*)\1$/.exec(textMaybeQuoted)
+  return matches ? matches[2] : textMaybeQuoted
 }
 
 function isIdentifierOrSchema(state: EditorState, node: SyntaxNode) {
@@ -26,7 +27,7 @@ function parentsFor(state: EditorState, node: SyntaxNode | null) {
     if (!node || node.name != ".") return path
     let name = tokenBefore(node)
     if (!name || !isIdentifierOrSchema(state, name)) return path
-    path.unshift(stripQuotes(state.sliceDoc(name.from, name.to)))
+    path.unshift(textUnquoted(state, name))
     node = tokenBefore(name)
   }
 }
@@ -48,30 +49,38 @@ function sourceContext(state: EditorState, startPos: number) {
 
 function resolveAlias(state: EditorState, node: SyntaxNode, parents: string[]): string[] {
   if (parents.length === 1) {
-    const aliasName = parents[0];
+    const aliasName = parents[0]
     // node.parent because the alias is referenced within a child (clause)
     for (let searchNode = findFromClause(state, node.parent)?.nextSibling; searchNode != null && !isKeyword(state, searchNode, "WHERE"); searchNode = searchNode.nextSibling) {
-      if ((searchNode.name == "Identifier" || searchNode.name == "QuotedIdentifier") && stripQuotes(state.sliceDoc(searchNode.from, searchNode.to)) === aliasName) {
-        let sourceNode = isKeyword(state, searchNode.prevSibling, "AS") ? searchNode.prevSibling.prevSibling : searchNode.prevSibling;
+      if ((searchNode.name == "Identifier" || searchNode.name == "QuotedIdentifier") && textUnquoted(state, searchNode) === aliasName) {
+        let sourceNode = isKeyword(state, searchNode.prevSibling, "AS") ? searchNode.prevSibling.prevSibling : searchNode.prevSibling
         if (sourceNode && /Identifier$/.test(sourceNode.name)) { // can be Identifier, QuotedIdentifier or CompositeIdentifier
-          return state.sliceDoc(sourceNode.from, sourceNode.to).split(".").map(stripQuotes);
+          if (sourceNode.name === "CompositeIdentifier") {
+            const path = [];
+            for (let node = sourceNode.firstChild; node != null; node = node.nextSibling?.nextSibling) { // skip every other child (=period)
+              path.push(textUnquoted(state, node))
+            }
+            return path
+          } else {
+            return [ textUnquoted(state, sourceNode) ]
+          }
         }
       }
     }
   }
-  return parents;
+  return parents
 }
 
 function findFromClause(state: EditorState, node: SyntaxNode): SyntaxNode {
   for (let searchNode = node.parent.firstChild; searchNode != null; searchNode = searchNode.nextSibling) {
     if (isKeyword(state, searchNode, "FROM"))
-      return searchNode;
+      return searchNode
   }
-  return null;
+  return null
 }
 
 function isKeyword(state: EditorState, node: SyntaxNode, keyword: string): boolean {
-  return node.name == "Keyword" && state.sliceDoc(node.from, node.to).toUpperCase() === keyword.toUpperCase();
+  return node.name == "Keyword" && state.sliceDoc(node.from, node.to).toUpperCase() === keyword.toUpperCase()
 }
 
 function maybeQuoteCompletions(quote: string | null, completions: readonly Completion[]) {
