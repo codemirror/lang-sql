@@ -285,7 +285,7 @@ export function tokensFor(d: Dialect) {
       input.acceptToken(Punctuation)
     } else if (isAlpha(next)) {
       let word = readWord(input, String.fromCharCode(next))
-      input.acceptToken(d.words[word.toLowerCase()] ?? Identifier)
+      input.acceptToken(input.next == Ch.Dot ? Identifier : d.words[word.toLowerCase()] ?? Identifier)
     }
   })
 }
