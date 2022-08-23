@@ -1,5 +1,5 @@
 import {Completion, CompletionContext, CompletionSource, completeFromList, ifNotIn} from "@codemirror/autocomplete"
-import {EditorState} from "@codemirror/state"
+import {EditorState, Text} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "@lezer/common"
 import {Type, Keyword} from "./sql.grammar.terms"
@@ -10,40 +10,79 @@ function tokenBefore(tree: SyntaxNode) {
   return cursor.node
 }
 
-function stripQuotes(name: string) {
-  let quoted = /^[`'"](.*)[`'"]$/.exec(name)
-  return quoted ? quoted[1] : name
+function idName(doc: Text, node: SyntaxNode): string {
+  let text = doc.sliceString(node.from, node.to)
+  let quoted = /^([`'"])(.*)\1$/.exec(text)
+  return quoted ? quoted[2] : text
 }
 
-function isIdentifierOrSchema(state: EditorState, node: SyntaxNode) {
-  // Handle a case when a "public" schema is specified, which also counts as a SQL keyword
-  return node.name == "Identifier" || node.name == "QuotedIdentifier" ||
-    (node.name == "Keyword" && /^public$/i.test(state.sliceDoc(node.from, node.to)))
+function plainID(node: SyntaxNode | null) {
+  return node && (node.name == "Identifier" || node.name == "QuotedIdentifier")
 }
 
-function parentsFor(state: EditorState, node: SyntaxNode | null) {
+function pathFor(doc: Text, id: SyntaxNode) {
+  if (id.name == "CompositeIdentifier") {
+    let path = []
+    for (let ch = id.firstChild; ch; ch = ch.nextSibling)
+      if (plainID(ch)) path.push(idName(doc, ch))
+    return path
+  }
+  return [idName(doc, id)]
+}
+
+function parentsFor(doc: Text, node: SyntaxNode | null) {
   for (let path = [];;) {
     if (!node || node.name != ".") return path
     let name = tokenBefore(node)
-    if (!name || !isIdentifierOrSchema(state, name)) return path
-    path.unshift(stripQuotes(state.sliceDoc(name.from, name.to)))
+    if (!plainID(name)) return path
+    path.unshift(idName(doc, name))
     node = tokenBefore(name)
   }
 }
 
 function sourceContext(state: EditorState, startPos: number) {
   let pos = syntaxTree(state).resolveInner(startPos, -1)
-  if (pos.name == "Identifier" || pos.name == "QuotedIdentifier") {
+  let aliases = getAliases(state.doc, pos)
+  if (pos.name == "Identifier" || pos.name == "QuotedIdentifier" || pos.name == "Keyword") {
     return {from: pos.from,
-            quoted: pos.name == "QuotedIdentifier" ? state.sliceDoc(pos.from, pos.from + 1) : null,
-            parents: parentsFor(state, tokenBefore(pos))}
+            quoted: pos.name == "QuotedIdentifier" ? state.doc.sliceString(pos.from, pos.from + 1) : null,
+            parents: parentsFor(state.doc, tokenBefore(pos)),
+            aliases}
   } if (pos.name == ".") {
-    return {from: startPos,
-            quoted: null,
-            parents: parentsFor(state, pos)}
+    return {from: startPos, quoted: null, parents: parentsFor(state.doc, pos), aliases}
   } else {
-    return {from: startPos, quoted: null, parents: [], empty: true}
+    return {from: startPos, quoted: null, parents: [], empty: true, aliases}
   }
+}
+
+const EndFrom = new Set("where group having order union intersect except all distinct limit offset fetch for".split(" "))
+
+function getAliases(doc: Text, at: SyntaxNode) {
+  let statement
+  for (let parent: SyntaxNode | null = at; !statement; parent = parent.parent) {
+    if (!parent) return null
+    if (parent.name == "Statement") statement = parent
+  }
+  let aliases = null
+  for (let scan = statement.firstChild, sawFrom = false, prevID: SyntaxNode | null = null; scan; scan = scan.nextSibling) {
+    let kw = scan.name == "Keyword" ? doc.sliceString(scan.from, scan.to).toLowerCase() : null
+    let alias = null
+    if (!sawFrom) {
+      sawFrom = kw == "from"
+    } else if (kw == "as" && prevID && plainID(scan.nextSibling)) {
+      alias = idName(doc, scan.nextSibling!)
+    } else if (kw && EndFrom.has(kw)) {
+      break
+    } else if (prevID && plainID(scan)) {
+      alias = idName(doc, scan)
+    }
+    if (alias) {
+      if (!aliases) aliases = Object.create(null)
+      aliases[alias] = pathFor(doc, prevID!)
+    }
+    prevID = /Identifier$/.test(scan.name) ? scan : null
+  }
+  return aliases
 }
 
 function maybeQuoteCompletions(quote: string | null, completions: readonly Completion[]) {
@@ -87,8 +126,9 @@ export function completeFromSchema(schema: {[table: string]: readonly (string | 
   top.list = defaultSchema.list.concat(top.childCompletions("type"))
 
   return (context: CompletionContext) => {
-    let {parents, from, quoted, empty} = sourceContext(context.state, context.pos)
+    let {parents, from, quoted, empty, aliases} = sourceContext(context.state, context.pos)
     if (empty && !context.explicit) return null
+    if (aliases && parents.length == 1) parents = aliases[parents[0]] || parents
     let level = top
     for (let name of parents) {
       while (!level.children || !level.children[name]) {
@@ -99,10 +139,13 @@ export function completeFromSchema(schema: {[table: string]: readonly (string | 
       level = level.child(name)
     }
     let quoteAfter = quoted && context.state.sliceDoc(context.pos, context.pos + 1) == quoted
+    let options = level.list
+    if (level == top && aliases)
+      options = options.concat(Object.keys(aliases).map(name => ({label: name, type: "constant"})))
     return {
       from,
       to: quoteAfter ? context.pos + 1 : undefined,
-      options: maybeQuoteCompletions(quoted, level.list),
+      options: maybeQuoteCompletions(quoted, options),
       validFor: quoted ? QuotedSpan : Span
     }
   }

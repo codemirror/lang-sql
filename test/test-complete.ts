@@ -120,6 +120,10 @@ describe("SQL completion", () => {
     ist(str(get('select u.| from "public"."users" u', {schema: schema2})), "email, id")
   })
 
+  it("completes aliased table names", () => {
+    ist(str(get('select a| from a.b as ab join auto au', {schema: schema2})), "ab, au, other, public")
+  })
+
   it("includes closing quote in completion", () => {
     let r = get('select "u|"', {schema: schema1})
     ist(r!.to, 10)
