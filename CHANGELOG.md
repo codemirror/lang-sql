@@ -1,3 +1,9 @@
+## 6.3.0 (2022-08-23)
+
+### New features
+
+Schema-based completion now understands basic table alias syntax, and will take it into account when looking up completions.
+
 ## 6.2.0 (2022-08-14)
 
 ### New features
