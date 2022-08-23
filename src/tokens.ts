@@ -189,7 +189,7 @@ export function tokensFor(d: Dialect) {
       eol(input)
       input.acceptToken(LineComment)
     } else if (next == Ch.Dash && input.next == Ch.Dash &&
-               (!d.spaceAfterDashes || input.peek(2) == Ch.Space)) {
+               (!d.spaceAfterDashes || input.peek(1) == Ch.Space)) {
       eol(input)
       input.acceptToken(LineComment)
     } else if (next == Ch.Slash && input.next == Ch.Star) {
