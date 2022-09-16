@@ -116,7 +116,7 @@ export interface SQLConfig {
   /// An object that maps table names, optionally prefixed with a
   /// schema name (`"schema.table"`) to options (columns) that can be
   /// completed for that table. Use lower-case names here.
-  schema?: {[table: string]: readonly (string | Completion)[]},
+  schema?: {[table: string]: readonly (string | Completion)[] | Promise<(string | Completion)[]>},
   /// By default, the completions for the table names will be
   /// generated from the `schema` object. But if you want to
   /// customize them, you can pass an array of completions through
