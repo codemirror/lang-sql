@@ -93,7 +93,7 @@ function maybeQuoteCompletions(quote: string | null, completions: readonly Compl
 const Span = /^\w*$/, QuotedSpan = /^[`'"]?\w*[`'"]?$/
 
 class CompletionLevel {
-  list: readonly (string | Completion)[] | Promise<(string | Completion)[]> = []
+  list: readonly (string | Completion)[] | (() => Promise<(string | Completion)[]>) = []
   children: {[name: string]: CompletionLevel} | undefined = undefined
 
   child(name: string) {
@@ -106,7 +106,7 @@ class CompletionLevel {
   }
 }
 
-export function completeFromSchema(schema: {[table: string]: readonly (string | Completion)[] | Promise<(string | Completion)[]>},
+export function completeFromSchema(schema: {[table: string]: readonly (string | Completion)[] | (() => Promise<(string | Completion)[]>)},
                                    tables?: readonly Completion[],
                                    defaultTableName?: string, defaultSchemaName?: string): CompletionSource {
   let top = new CompletionLevel
@@ -139,7 +139,8 @@ export function completeFromSchema(schema: {[table: string]: readonly (string | 
       level = level.child(name)
     }
     let quoteAfter = quoted && context.state.sliceDoc(context.pos, context.pos + 1) == quoted
-    let options = (await level.list).map(val => typeof val == "string" ? {label: val, type: "property"} : val)
+    let list = typeof level.list === 'function' ? await level.list() : level.list;
+    let options = list.map(val => typeof val == "string" ? {label: val, type: "property"} : val)
     if (level == top && aliases)
       options = options.concat(Object.keys(aliases).map(name => ({label: name, type: "constant"})))
     return {
