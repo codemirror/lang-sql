@@ -96,6 +96,7 @@ export class SQLDialect {
   static define(spec: SQLDialectSpec) {
     let d = dialect(spec, spec.keywords, spec.types, spec.builtin)
     let language = LRLanguage.define({
+      name: "sql",
       parser: parser.configure({
         tokenizers: [{from: tokens, to: tokensFor(d)}]
       }),
