@@ -2,7 +2,7 @@ import {ExternalTokenizer, InputStream} from "@lezer/lr"
 import {whitespace, LineComment, BlockComment, String as StringToken, Number, Bits, Bytes, Bool, Null,
         ParenL, ParenR, BraceL, BraceR, BracketL, BracketR, Semi, Dot,
         Operator, Punctuation, SpecialVar, Identifier, QuotedIdentifier,
-        Keyword, Type, Builtin} from "./sql.grammar.terms"
+        Keyword, Type, Builtin, Begin, End} from "./sql.grammar.terms"
 
 const enum Ch {
   Newline = 10,
@@ -27,6 +27,7 @@ const enum Ch {
   Underscore = 95,
   Backtick = 96,
   BraceL = 123, BraceR = 125,
+  Begin = 150, End = 151,
 
   A = 65, a = 97,
   B = 66, b = 98,
@@ -285,7 +286,13 @@ export function tokensFor(d: Dialect) {
       input.acceptToken(Punctuation)
     } else if (isAlpha(next)) {
       let word = readWord(input, String.fromCharCode(next))
-      input.acceptToken(input.next == Ch.Dot ? Identifier : d.words[word.toLowerCase()] ?? Identifier)
+      if (word.toLowerCase() === "begin") {
+        input.acceptToken(Begin)
+      } else if (word.toLowerCase() === "end") {
+        input.acceptToken(End)
+      } else {
+        input.acceptToken(input.next == Ch.Dot ? Identifier : d.words[word.toLowerCase()] ?? Identifier)
+      }
     }
   })
 }

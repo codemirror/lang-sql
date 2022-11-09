@@ -27,7 +27,8 @@ element {
   Punctuation |
   Parens { ParenL element* ParenR } |
   Braces { BraceL element* BraceR } |
-  Brackets { BracketL element* BracketR }
+  Brackets { BracketL element* BracketR } |
+  BeginEnd { Begin (element | Semi)+ End }
 }
 
 @external tokens tokens from "./tokens" {
@@ -56,6 +57,8 @@ element {
   Bits
   Bytes
   Builtin
+  Begin[@name="begin"]
+  End[@name="end"]
 }
 
 @detectDelim
