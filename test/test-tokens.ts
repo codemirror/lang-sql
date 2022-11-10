@@ -29,6 +29,10 @@ describe("Parse PostgreSQL tokens", () => {
   it("parses quoted bit-value literals", () => {
     ist(parser.parse("SELECT B'0101'"), 'Script(Statement(Keyword,Bits))')
   })
+
+  it("parses double dollar quoted string literals", () => {
+    ist(parser.parse("SELECT $$hello$$"), 'Script(Statement(Keyword,String))')
+  })
 })
 
 describe("Parse BigQuery tokens", () => {
