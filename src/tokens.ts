@@ -134,7 +134,7 @@ export interface Dialect {
   spaceAfterDashes: boolean,
   slashComments: boolean,
   doubleQuotedStrings: boolean,
-  doubleDollarStrings: boolean,
+  doubleDollarQuotedStrings: boolean,
   unquotedBitLiterals: boolean,
   treatBitsAsBytes: boolean,
   charSetCasts: boolean,
@@ -153,7 +153,7 @@ const defaults: Dialect = {
   spaceAfterDashes: false,
   slashComments: false,
   doubleQuotedStrings: false,
-  doubleDollarStrings: false,
+  doubleDollarQuotedStrings: false,
   unquotedBitLiterals: false,
   treatBitsAsBytes: false,
   charSetCasts: false,
@@ -178,7 +178,7 @@ export function tokensFor(d: Dialect) {
     if (inString(next, Space)) {
       while (inString(input.next, Space)) input.advance()
       input.acceptToken(whitespace)
-    } else if (next == Ch.Dollar && input.next == Ch.Dollar && d.doubleDollarStrings) {
+    } else if (next == Ch.Dollar && input.next == Ch.Dollar && d.doubleDollarQuotedStrings) {
       readDoubleDollarLiteral(input)
       input.acceptToken(StringToken)
     } else if (next == Ch.SingleQuote || next == Ch.DoubleQuote && d.doubleQuotedStrings) {
