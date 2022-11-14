@@ -1,3 +1,9 @@
+## 6.3.3 (2022-11-14)
+
+### Bug fixes
+
+Fix tokenizing of double-`$` strings in SQL dialects that support them.
+
 ## 6.3.2 (2022-10-24)
 
 ### Bug fixes
