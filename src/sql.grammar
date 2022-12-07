@@ -40,10 +40,10 @@ element {
   Null
   ParenL[@name="("]
   ParenR[@name=")"]
-  BraceL[@name="["]
-  BraceR[@name="]"]
-  BracketL[@name="{"]
-  BracketR[@name="}"]
+  BraceL[@name="{"]
+  BraceR[@name="}"]
+  BracketL[@name="["]
+  BracketR[@name="]"]
   Semi[@name=";"]
   Dot[@name="."]
   Operator
