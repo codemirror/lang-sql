@@ -107,7 +107,7 @@ class CompletionLevel {
 }
 
 export function completeFromSchema(schema: {[table: string]: readonly (string | Completion)[]},
-                                   tables?: readonly Completion[],
+                                   tables?: readonly Completion[], schemas?: readonly Completion[],
                                    defaultTableName?: string, defaultSchemaName?: string): CompletionSource {
   let top = new CompletionLevel
   let defaultSchema = top.child(defaultSchemaName || "")
@@ -123,7 +123,7 @@ export function completeFromSchema(schema: {[table: string]: readonly (string | 
     let schema = top.child(sName)
     if (!schema.list.length) schema.list = schema.childCompletions("type")
   }
-  top.list = defaultSchema.list.concat(top.childCompletions("type"))
+  top.list = defaultSchema.list.concat(schemas || top.childCompletions("type"))
 
   return (context: CompletionContext) => {
     let {parents, from, quoted, empty, aliases} = sourceContext(context.state, context.pos)
