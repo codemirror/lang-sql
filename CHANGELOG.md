@@ -1,3 +1,13 @@
+## 6.4.0 (2023-01-23)
+
+### Bug fixes
+
+Fix syntax tree node names for curly and square brackets, which had their names swapped.
+
+### New features
+
+The new `schemas` config option can be used to provide custom completion objects for schema completions.
+
 ## 6.3.3 (2022-11-14)
 
 ### Bug fixes
