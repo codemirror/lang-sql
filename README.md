@@ -54,6 +54,12 @@ completed for that table. Use lower-case names here.</p>
 generated from the <code>schema</code> object. But if you want to
 customize them, you can pass an array of completions through
 this option.</p>
+</dd><dt id="user-content-sqlconfig.schemas">
+  <code><strong><a href="#user-content-sqlconfig.schemas">schemas</a></strong>&#8288;?: readonly <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>[]</code></dt>
+
+<dd><p>Similar to <code>tables</code>, if you want to provide completion objects
+for your schemas rather than using the generated ones, pass them
+here.</p>
 </dd><dt id="user-content-sqlconfig.defaulttable">
   <code><strong><a href="#user-content-sqlconfig.defaulttable">defaultTable</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
@@ -87,7 +93,7 @@ completed directly at the top level.</p>
 
 <dd><p>Returns the language for this dialect as an extension.</p>
 </dd><dt id="user-content-sqldialect^define">
-  <code>static <strong><a href="#user-content-sqldialect^define">define</a></strong>(<a id="user-content-sqldialect^define^spec" href="#user-content-sqldialect^define^spec">spec</a>: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>) → <a href="#user-content-sqldialect">SQLDialect</a></code></dt>
+  <code>static <strong><a href="#user-content-sqldialect^define">define</a></strong>(<a id="user-content-sqldialect^define^spec" href="#user-content-sqldialect^define^spec">spec</a>: {treatBitsAsBytes&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>}) → <a href="#user-content-sqldialect">SQLDialect</a></code></dt>
 
 <dd><p>Define a new dialect.</p>
 <dl><dt id="user-content-sqldialect^define^spec">
@@ -151,6 +157,11 @@ Defaults to <code>&quot;?&quot;</code>.</p>
 
 <dd><p>The characters that can be used to quote identifiers. Defaults
 to <code>&quot;\&quot;&quot;</code>.</p>
+</dd><dt id="user-content-sqldialect^define^spec.unquotedbitliterals">
+  <code><strong><a href="#user-content-sqldialect^define^spec.unquotedbitliterals">unquotedBitLiterals</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+
+<dd><p>Controls whether bit values can be defined as 0b1010. Defaults
+to false.</p>
 </dd></dl></dd></dl></dd></dl>
 
 </dd>
