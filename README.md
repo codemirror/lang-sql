@@ -54,6 +54,12 @@ completed for that table. Use lower-case names here.</p>
 generated from the <code>schema</code> object. But if you want to
 customize them, you can pass an array of completions through
 this option.</p>
+</dd><dt id="user-content-sqlconfig.schemas">
+  <code><strong><a href="#user-content-sqlconfig.schemas">schemas</a></strong>&#8288;?: readonly <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>[]</code></dt>
+
+<dd><p>Similar to <code>tables</code> , if you want to provide 
+completion objects for your schemas rather than using the 
+generated ones, pass them here.</p>
 </dd><dt id="user-content-sqlconfig.defaulttable">
   <code><strong><a href="#user-content-sqlconfig.defaulttable">defaultTable</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
