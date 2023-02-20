@@ -2,14 +2,14 @@
 
 # @codemirror/lang-sql [![NPM version](https://img.shields.io/npm/v/@codemirror/lang-sql.svg)](https://www.npmjs.org/package/@codemirror/lang-sql)
 
-[ [**WEBSITE**](https://codemirror.net/6/) | [**ISSUES**](https://github.com/codemirror/dev/issues) | [**FORUM**](https://discuss.codemirror.net/c/next/) | [**CHANGELOG**](https://github.com/codemirror/lang-sql/blob/main/CHANGELOG.md) ]
+[ [**WEBSITE**](https://codemirror.net/) | [**ISSUES**](https://github.com/codemirror/dev/issues) | [**FORUM**](https://discuss.codemirror.net/c/next/) | [**CHANGELOG**](https://github.com/codemirror/lang-sql/blob/main/CHANGELOG.md) ]
 
 This package implements SQL language support for the
-[CodeMirror](https://codemirror.net/6/) code editor.
+[CodeMirror](https://codemirror.net/) code editor.
 
-The [project page](https://codemirror.net/6/) has more information, a
-number of [examples](https://codemirror.net/6/examples/) and the
-[documentation](https://codemirror.net/6/docs/).
+The [project page](https://codemirror.net/) has more information, a
+number of [examples](https://codemirror.net/examples/) and the
+[documentation](https://codemirror.net/docs/).
 
 This code is released under an
 [MIT license](https://github.com/codemirror/lang-sql/tree/main/LICENSE).
