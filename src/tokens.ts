@@ -194,18 +194,17 @@ export function tokensFor(d: Dialect) {
       input.acceptToken(LineComment)
     } else if (next == Ch.Slash && input.next == Ch.Star) {
       input.advance()
-      for (let prev = -1, depth = 1;;) {
+      for (let depth = 1;;) {
+        let cur: number = input.next
         if (input.next < 0) break
         input.advance()
-        if (prev == Ch.Star && (input as any).next == Ch.Slash) {
+        if (cur == Ch.Star && (input as any).next == Ch.Slash) {
           depth--
-          if (!depth) { input.advance(); break }
-          prev = -1
-        } else if (prev == Ch.Slash && input.next == Ch.Star) {
+          input.advance()
+          if (!depth) break
+        } else if (cur == Ch.Slash && input.next == Ch.Star) {
           depth++
-          prev = -1
-        } else {
-          prev = input.next
+          input.advance()
         }
       }
       input.acceptToken(BlockComment)
