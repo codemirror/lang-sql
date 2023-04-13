@@ -1,3 +1,9 @@
+## 6.4.1 (2023-04-13)
+
+### Bug fixes
+
+Fix a bug where tokenizing of block comments got confused when nested comment start/end markers appeared directly next to each other.
+
 ## 6.4.0 (2023-01-23)
 
 ### Bug fixes
