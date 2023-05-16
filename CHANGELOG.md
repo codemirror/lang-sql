@@ -1,3 +1,9 @@
+## 6.5.0 (2023-05-16)
+
+### New features
+
+Dialect objects now have a public `spec` property holding their configuration.
+
 ## 6.4.1 (2023-04-13)
 
 ### Bug fixes
