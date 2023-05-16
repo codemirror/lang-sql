@@ -88,81 +88,97 @@ completed directly at the top level.</p>
   <code><strong><a href="#user-content-sqldialect.language">language</a></strong>: <a href="https://codemirror.net/docs/ref#language.LRLanguage">LRLanguage</a></code></dt>
 
 <dd><p>The language for this dialect.</p>
+</dd><dt id="user-content-sqldialect.spec">
+  <code><strong><a href="#user-content-sqldialect.spec">spec</a></strong>: <a href="#user-content-sqldialectspec">SQLDialectSpec</a></code></dt>
+
+<dd><p>The spec used to define this dialect.</p>
 </dd><dt id="user-content-sqldialect.extension">
   <code><strong><a href="#user-content-sqldialect.extension">extension</a></strong>: <a href="https://codemirror.net/docs/ref#state.Extension">Extension</a></code></dt>
 
 <dd><p>Returns the language for this dialect as an extension.</p>
 </dd><dt id="user-content-sqldialect^define">
-  <code>static <strong><a href="#user-content-sqldialect^define">define</a></strong>(<a id="user-content-sqldialect^define^spec" href="#user-content-sqldialect^define^spec">spec</a>: {treatBitsAsBytes&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>}) → <a href="#user-content-sqldialect">SQLDialect</a></code></dt>
+  <code>static <strong><a href="#user-content-sqldialect^define">define</a></strong>(<a id="user-content-sqldialect^define^spec" href="#user-content-sqldialect^define^spec">spec</a>: <a href="#user-content-sqldialectspec">SQLDialectSpec</a>) → <a href="#user-content-sqldialect">SQLDialect</a></code></dt>
 
 <dd><p>Define a new dialect.</p>
-<dl><dt id="user-content-sqldialect^define^spec">
-  <code><strong><a href="#user-content-sqldialect^define^spec">spec</a></strong></code></dt>
+</dd></dl>
 
-<dd><dl><dt id="user-content-sqldialect^define^spec.keywords">
-  <code><strong><a href="#user-content-sqldialect^define^spec.keywords">keywords</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
+</dd>
+<dt id="user-content-sqldialectspec">
+  <h4>
+    <code>type</code>
+    <a href="#user-content-sqldialectspec">SQLDialectSpec</a></h4>
+</dt>
+
+<dd><p>Configuration for an <a href="#user-content-sqldialect">SQL Dialect</a>.</p>
+<dl><dt id="user-content-sqldialectspec.keywords">
+  <code><strong><a href="#user-content-sqldialectspec.keywords">keywords</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
 <dd><p>A space-separated list of keywords for the dialect.</p>
-</dd><dt id="user-content-sqldialect^define^spec.builtin">
-  <code><strong><a href="#user-content-sqldialect^define^spec.builtin">builtin</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.builtin">
+  <code><strong><a href="#user-content-sqldialectspec.builtin">builtin</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
 <dd><p>A space-separated string of built-in identifiers for the dialect.</p>
-</dd><dt id="user-content-sqldialect^define^spec.types">
-  <code><strong><a href="#user-content-sqldialect^define^spec.types">types</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.types">
+  <code><strong><a href="#user-content-sqldialectspec.types">types</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
 <dd><p>A space-separated string of type names for the dialect.</p>
-</dd><dt id="user-content-sqldialect^define^spec.backslashescapes">
-  <code><strong><a href="#user-content-sqldialect^define^spec.backslashescapes">backslashEscapes</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.backslashescapes">
+  <code><strong><a href="#user-content-sqldialectspec.backslashescapes">backslashEscapes</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
 <dd><p>Controls whether regular strings allow backslash escapes.</p>
-</dd><dt id="user-content-sqldialect^define^spec.hashcomments">
-  <code><strong><a href="#user-content-sqldialect^define^spec.hashcomments">hashComments</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.hashcomments">
+  <code><strong><a href="#user-content-sqldialectspec.hashcomments">hashComments</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
 <dd><p>Controls whether # creates a line comment.</p>
-</dd><dt id="user-content-sqldialect^define^spec.slashcomments">
-  <code><strong><a href="#user-content-sqldialect^define^spec.slashcomments">slashComments</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.slashcomments">
+  <code><strong><a href="#user-content-sqldialectspec.slashcomments">slashComments</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
 <dd><p>Controls whether <code>//</code> creates a line comment.</p>
-</dd><dt id="user-content-sqldialect^define^spec.spaceafterdashes">
-  <code><strong><a href="#user-content-sqldialect^define^spec.spaceafterdashes">spaceAfterDashes</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.spaceafterdashes">
+  <code><strong><a href="#user-content-sqldialectspec.spaceafterdashes">spaceAfterDashes</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
 <dd><p>When enabled <code>--</code> comments are only recognized when there's a
 space after the dashes.</p>
-</dd><dt id="user-content-sqldialect^define^spec.doubledollarquotedstrings">
-  <code><strong><a href="#user-content-sqldialect^define^spec.doubledollarquotedstrings">doubleDollarQuotedStrings</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.doubledollarquotedstrings">
+  <code><strong><a href="#user-content-sqldialectspec.doubledollarquotedstrings">doubleDollarQuotedStrings</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
 <dd><p>When enabled, things quoted with &quot;$&quot; are treated as
 strings, rather than identifiers.</p>
-</dd><dt id="user-content-sqldialect^define^spec.doublequotedstrings">
-  <code><strong><a href="#user-content-sqldialect^define^spec.doublequotedstrings">doubleQuotedStrings</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.doublequotedstrings">
+  <code><strong><a href="#user-content-sqldialectspec.doublequotedstrings">doubleQuotedStrings</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
 <dd><p>When enabled, things quoted with double quotes are treated as
 strings, rather than identifiers.</p>
-</dd><dt id="user-content-sqldialect^define^spec.charsetcasts">
-  <code><strong><a href="#user-content-sqldialect^define^spec.charsetcasts">charSetCasts</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.charsetcasts">
+  <code><strong><a href="#user-content-sqldialectspec.charsetcasts">charSetCasts</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
 <dd><p>Enables strings like <code>_utf8'str'</code> or <code>N'str'</code>.</p>
-</dd><dt id="user-content-sqldialect^define^spec.operatorchars">
-  <code><strong><a href="#user-content-sqldialect^define^spec.operatorchars">operatorChars</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.operatorchars">
+  <code><strong><a href="#user-content-sqldialectspec.operatorchars">operatorChars</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
 <dd><p>The set of characters that make up operators. Defaults to
 <code>&quot;*+\-%&lt;&gt;!=&amp;|~^/&quot;</code>.</p>
-</dd><dt id="user-content-sqldialect^define^spec.specialvar">
-  <code><strong><a href="#user-content-sqldialect^define^spec.specialvar">specialVar</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.specialvar">
+  <code><strong><a href="#user-content-sqldialectspec.specialvar">specialVar</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
 <dd><p>The set of characters that start a special variable name.
 Defaults to <code>&quot;?&quot;</code>.</p>
-</dd><dt id="user-content-sqldialect^define^spec.identifierquotes">
-  <code><strong><a href="#user-content-sqldialect^define^spec.identifierquotes">identifierQuotes</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.identifierquotes">
+  <code><strong><a href="#user-content-sqldialectspec.identifierquotes">identifierQuotes</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
 <dd><p>The characters that can be used to quote identifiers. Defaults
 to <code>&quot;\&quot;&quot;</code>.</p>
-</dd><dt id="user-content-sqldialect^define^spec.unquotedbitliterals">
-  <code><strong><a href="#user-content-sqldialect^define^spec.unquotedbitliterals">unquotedBitLiterals</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.unquotedbitliterals">
+  <code><strong><a href="#user-content-sqldialectspec.unquotedbitliterals">unquotedBitLiterals</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
 <dd><p>Controls whether bit values can be defined as 0b1010. Defaults
 to false.</p>
-</dd></dl></dd></dl></dd></dl>
+</dd><dt id="user-content-sqldialectspec.treatbitsasbytes">
+  <code><strong><a href="#user-content-sqldialectspec.treatbitsasbytes">treatBitsAsBytes</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+
+<dd><p>Controls whether bit values can contain other characters than 0 and 1.
+Defaults to false.</p>
+</dd></dl>
 
 </dd>
 <dt id="user-content-standardsql">

@@ -39,7 +39,8 @@ let parser = baseParser.configure({
   ]
 })
 
-type SQLDialectSpec = {
+/// Configuration for an [SQL Dialect](#lang-sql.SQLDialect).
+export type SQLDialectSpec = {
   /// A space-separated list of keywords for the dialect.
   keywords?: string,
   /// A space-separated string of built-in identifiers for the dialect.
@@ -75,8 +76,8 @@ type SQLDialectSpec = {
   /// Controls whether bit values can be defined as 0b1010. Defaults
   /// to false.
   unquotedBitLiterals?: boolean,
-  // Controls whether bit values can contain other characters than 0 and 1.
-  // Defaults to false.
+  /// Controls whether bit values can contain other characters than 0 and 1.
+  /// Defaults to false.
   treatBitsAsBytes?: boolean,
 }
 
@@ -86,7 +87,9 @@ export class SQLDialect {
     /// @internal
     readonly dialect: Dialect,
     /// The language for this dialect.
-    readonly language: LRLanguage
+    readonly language: LRLanguage,
+    /// The spec used to define this dialect.
+    readonly spec: SQLDialectSpec
   ) {}
 
   /// Returns the language for this dialect as an extension.
@@ -105,7 +108,7 @@ export class SQLDialect {
         closeBrackets: {brackets: ["(", "[", "{", "'", '"', "`"]}
       }
     })
-    return new SQLDialect(d, language)
+    return new SQLDialect(d, language, spec)
   }
 }
 

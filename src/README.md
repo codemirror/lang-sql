@@ -27,6 +27,8 @@ to communication around the project.
 
 @SQLDialect
 
+@SQLDialectSpec
+
 @StandardSQL
 @PostgreSQL
 @MySQL
