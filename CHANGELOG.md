@@ -1,3 +1,9 @@
+## 6.5.1 (2023-06-21)
+
+### Bug fixes
+
+`schemaCompletionSource` now adds quotes around non-word identifiers even if the user didn't type a starting quote.
+
 ## 6.5.0 (2023-05-16)
 
 ### New features
