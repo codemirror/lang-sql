@@ -3,6 +3,7 @@ import {EditorState, Text} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "@lezer/common"
 import {Type, Keyword} from "./sql.grammar.terms"
+import {type SQLDialect} from "./sql"
 
 function tokenBefore(tree: SyntaxNode) {
   let cursor = tree.cursor().moveTo(tree.from, -1)
@@ -101,29 +102,36 @@ class CompletionLevel {
     return children[name] || (children[name] = new CompletionLevel)
   }
 
-  childCompletions(type: string) {
-    return this.children ? Object.keys(this.children).filter(x => x).map(name => ({label: name, type} as Completion)) : []
+  childCompletions(type: string, idQuote: string) {
+    return this.children ? Object.keys(this.children).filter(x => x).map(name => nameCompletion(name, type, idQuote)) : []
   }
+}
+
+function nameCompletion(label: string, type: string, idQuote: string): Completion {
+  if (!/[^\w\xb5-\uffff]/.test(label)) return {label, type}
+  return {label, type, apply: idQuote + label + idQuote}
 }
 
 export function completeFromSchema(schema: {[table: string]: readonly (string | Completion)[]},
                                    tables?: readonly Completion[], schemas?: readonly Completion[],
-                                   defaultTableName?: string, defaultSchemaName?: string): CompletionSource {
+                                   defaultTableName?: string, defaultSchemaName?: string,
+                                   dialect?: SQLDialect): CompletionSource {
   let top = new CompletionLevel
   let defaultSchema = top.child(defaultSchemaName || "")
+  let idQuote = dialect?.spec.identifierQuotes?.[0] || '"'
   for (let table in schema) {
     let dot = table.indexOf(".")
     let schemaCompletions = dot > -1 ? top.child(table.slice(0, dot)) : defaultSchema
     let tableCompletions = schemaCompletions.child(dot > -1 ? table.slice(dot + 1) : table)
-    tableCompletions.list = schema[table].map(val => typeof val == "string" ? {label: val, type: "property"} : val)
+    tableCompletions.list = schema[table].map(val => typeof val == "string" ? nameCompletion(val, "property", idQuote) : val)
   }
-  defaultSchema.list = (tables || defaultSchema.childCompletions("type"))
+  defaultSchema.list = (tables || defaultSchema.childCompletions("type", idQuote))
                          .concat(defaultTableName ? defaultSchema.child(defaultTableName).list : [])
   for (let sName in top.children) {
     let schema = top.child(sName)
-    if (!schema.list.length) schema.list = schema.childCompletions("type")
+    if (!schema.list.length) schema.list = schema.childCompletions("type", idQuote)
   }
-  top.list = defaultSchema.list.concat(schemas || top.childCompletions("type"))
+  top.list = defaultSchema.list.concat(schemas || top.childCompletions("type", idQuote))
 
   return (context: CompletionContext) => {
     let {parents, from, quoted, empty, aliases} = sourceContext(context.state, context.pos)

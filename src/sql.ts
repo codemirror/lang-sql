@@ -157,7 +157,8 @@ export function keywordCompletion(dialect: SQLDialect, upperCase = false): Exten
 /// for the given configuration.
 export function schemaCompletionSource(config: SQLConfig): CompletionSource {
   return config.schema ? completeFromSchema(config.schema, config.tables, config.schemas,
-                                            config.defaultTable, config.defaultSchema)
+                                            config.defaultTable, config.defaultSchema,
+                                            config.dialect || StandardSQL)
     : () => null
 }
 

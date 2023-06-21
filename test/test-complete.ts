@@ -154,4 +154,11 @@ describe("SQL completion", () => {
   it("does complete explicitly without identifier", () => {
     ist(str(get("select |", {schema: schema1, explicit: true})), "products, users")
   })
+
+  it("adds identifiers for non-word completions", () => {
+    ist(get("foo.b|", {schema: {foo: ["b c", "b-c", "bup"]}, dialect: PostgreSQL})!
+          .options.map(o => o.apply || o.label).join(), '"b c","b-c",bup')
+    ist(get("foo.b|", {schema: {foo: ["b c", "b-c", "bup"]}, dialect: MySQL})!
+          .options.map(o => o.apply || o.label).join(), '`b c`,`b-c`,bup')
+  })
 })
