@@ -94,16 +94,23 @@ function maybeQuoteCompletions(quote: string | null, completions: readonly Compl
 const Span = /^\w*$/, QuotedSpan = /^[`'"]?\w*[`'"]?$/
 
 class CompletionLevel {
-  list: readonly Completion[] = []
+  list: Completion[] = []
   children: {[name: string]: CompletionLevel} | undefined = undefined
 
-  child(name: string) {
+  child(name: string, idQuote: string) {
     let children = this.children || (this.children = Object.create(null))
-    return children[name] || (children[name] = new CompletionLevel)
+    let found = children[name]
+    if (found) return found
+    if (name) this.list.push(nameCompletion(name, "type", idQuote))
+    return (children[name] = new CompletionLevel)
   }
 
-  childCompletions(type: string, idQuote: string) {
-    return this.children ? Object.keys(this.children).filter(x => x).map(name => nameCompletion(name, type, idQuote)) : []
+  addCompletions(list: readonly Completion[]) {
+    for (let option of list) {
+      let found = this.list.findIndex(o => o.label == option.label)
+      if (found > -1) this.list[found] = option
+      else this.list.push(option)
+    }
   }
 }
 
@@ -117,21 +124,18 @@ export function completeFromSchema(schema: {[table: string]: readonly (string | 
                                    defaultTableName?: string, defaultSchemaName?: string,
                                    dialect?: SQLDialect): CompletionSource {
   let top = new CompletionLevel
-  let defaultSchema = top.child(defaultSchemaName || "")
   let idQuote = dialect?.spec.identifierQuotes?.[0] || '"'
+  let defaultSchema = top.child(defaultSchemaName || "", idQuote)
   for (let table in schema) {
-    let dot = table.indexOf(".")
-    let schemaCompletions = dot > -1 ? top.child(table.slice(0, dot)) : defaultSchema
-    let tableCompletions = schemaCompletions.child(dot > -1 ? table.slice(dot + 1) : table)
-    tableCompletions.list = schema[table].map(val => typeof val == "string" ? nameCompletion(val, "property", idQuote) : val)
+    let parts = table.split("."), base = parts.length == 1 ? defaultSchema : top
+    for (let part of parts) base = base.child(part, idQuote)
+    for (let option of schema[table]) if (option)
+      base.list.push(typeof option == "string" ? nameCompletion(option, "property", idQuote) : option)
   }
-  defaultSchema.list = (tables || defaultSchema.childCompletions("type", idQuote))
-                         .concat(defaultTableName ? defaultSchema.child(defaultTableName).list : [])
-  for (let sName in top.children) {
-    let schema = top.child(sName)
-    if (!schema.list.length) schema.list = schema.childCompletions("type", idQuote)
-  }
-  top.list = defaultSchema.list.concat(schemas || top.childCompletions("type", idQuote))
+  if (tables) defaultSchema.addCompletions(tables)
+  if (schemas) top.addCompletions(schemas)
+  top.addCompletions(defaultSchema.list)
+  if (defaultTableName) top.addCompletions(defaultSchema.child(defaultTableName, idQuote).list)
 
   return (context: CompletionContext) => {
     let {parents, from, quoted, empty, aliases} = sourceContext(context.state, context.pos)
@@ -141,10 +145,10 @@ export function completeFromSchema(schema: {[table: string]: readonly (string | 
     for (let name of parents) {
       while (!level.children || !level.children[name]) {
         if (level == top) level = defaultSchema
-        else if (level == defaultSchema && defaultTableName) level = level.child(defaultTableName)
+        else if (level == defaultSchema && defaultTableName) level = level.child(defaultTableName, idQuote)
         else return null
       }
-      level = level.child(name)
+      level = level.child(name, idQuote)
     }
     let quoteAfter = quoted && context.state.sliceDoc(context.pos, context.pos + 1) == quoted
     let options = level.list

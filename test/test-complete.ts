@@ -161,4 +161,12 @@ describe("SQL completion", () => {
     ist(get("foo.b|", {schema: {foo: ["b c", "b-c", "bup"]}, dialect: MySQL})!
           .options.map(o => o.apply || o.label).join(), '`b c`,`b-c`,bup')
   })
+
+  it("supports nesting more than two deep", () => {
+    let s = {schema: {"one.two.three": ["four"]}}
+    ist(str(get("o|", s)), "one")
+    ist(str(get("one.|", s)), "two")
+    ist(str(get("one.two.|", s)), "three")
+    ist(str(get("one.two.three.|", s)), "four")
+  })
 })
