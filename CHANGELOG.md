@@ -1,3 +1,9 @@
+## 6.5.2 (2023-06-23)
+
+### Bug fixes
+
+Allow table names to contain multiple dots in the schema passed to `schemaCompletionSource`.
+
 ## 6.5.1 (2023-06-21)
 
 ### Bug fixes
