@@ -20,7 +20,7 @@ function get(doc: string, conf: SQLConfig & {explicit?: boolean} = {}) {
 function str(result: CompletionResult | null) {
   return !result ? "" : result.options.slice()
     .sort((a, b) => (b.boost || 0) - (a.boost || 0) || (a.label < b.label ? -1 : 1))
-    .map(o => o.label)
+    .map(o => o.apply || o.label)
     .join(", ")
 }
 
@@ -156,10 +156,10 @@ describe("SQL completion", () => {
   })
 
   it("adds identifiers for non-word completions", () => {
-    ist(get("foo.b|", {schema: {foo: ["b c", "b-c", "bup"]}, dialect: PostgreSQL})!
-          .options.map(o => o.apply || o.label).join(), '"b c","b-c",bup')
-    ist(get("foo.b|", {schema: {foo: ["b c", "b-c", "bup"]}, dialect: MySQL})!
-          .options.map(o => o.apply || o.label).join(), '`b c`,`b-c`,bup')
+    ist(str(get("foo.b|", {schema: {foo: ["b c", "b-c", "bup"]}, dialect: PostgreSQL})),
+        '"b c", "b-c", bup')
+    ist(str(get("foo.b|", {schema: {foo: ["b c", "b-c", "bup"]}, dialect: MySQL})),
+        '`b c`, `b-c`, bup')
   })
 
   it("supports nesting more than two deep", () => {
@@ -169,4 +169,10 @@ describe("SQL completion", () => {
     ist(str(get("one.two.|", s)), "three")
     ist(str(get("one.two.three.|", s)), "four")
   })
+
+  it("supports escaped dots in table names", () => {
+    let s = {schema: {"db\\.conf": ["abc"]}}
+    ist(str(get("db|", s)), '"db.conf"')
+    ist(str(get('"db.conf".|', s)), "abc")
+  })    
 })
