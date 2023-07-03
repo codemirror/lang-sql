@@ -128,7 +128,7 @@ export function completeFromSchema(schema: {[table: string]: readonly (string | 
   let defaultSchema = top.child(defaultSchemaName || "", idQuote)
   for (let table in schema) {
     let parts = table.split(/(?<!\\)\./), base = parts.length == 1 ? defaultSchema : top
-    for (let part of parts) base = base.child(part.replace(/\\\./, "."), idQuote)
+    for (let part of parts) base = base.child(part.replace(/\\\./g, "."), idQuote)
     for (let option of schema[table]) if (option)
       base.list.push(typeof option == "string" ? nameCompletion(option, "property", idQuote) : option)
   }
