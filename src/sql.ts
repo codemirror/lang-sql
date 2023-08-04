@@ -64,6 +64,14 @@ export type SQLDialectSpec = {
   doubleQuotedStrings?: boolean,
   /// Enables strings like `_utf8'str'` or `N'str'`.
   charSetCasts?: boolean,
+  /// Enables strings like `q'[str]'` which are composed as such:
+  /// - a starting `q` in lower or uppercase
+  /// - a single quote `'`
+  /// - a starting quote delimiter: [, {, <, (, or a custom, non whitespace character
+  /// - the actual string, which can be multiline and can contain single quotes
+  /// - the matching closing quote delimiter: ], }, >, ), or the same custom character 
+  /// - a single quote `'`
+  alternativeQuotingMechanism?: boolean,
   /// The set of characters that make up operators. Defaults to
   /// `"*+\-%<>!=&|~^/"`.
   operatorChars?: string,
@@ -261,5 +269,6 @@ export const PLSQL = SQLDialect.define({
   types: SQLTypes + "ascii bfile bfilename bigserial bit blob dec long number nvarchar nvarchar2 serial smallint string text uid varchar2 xml",
   operatorChars: "*/+-%<>!=~",
   doubleQuotedStrings: true,
-  charSetCasts: true
+  charSetCasts: true,
+  alternativeQuotingMechanism: true
 })

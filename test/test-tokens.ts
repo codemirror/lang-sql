@@ -1,11 +1,12 @@
 import ist from "ist"
-import {PostgreSQL, MySQL, SQLDialect} from "@codemirror/lang-sql"
+import {PostgreSQL, MySQL, PLSQL, SQLDialect} from "@codemirror/lang-sql"
 
 const mysqlTokens = MySQL.language
 const postgresqlTokens = PostgreSQL.language
 const bigQueryTokens = SQLDialect.define({
   treatBitsAsBytes: true
 }).language
+const plsqlTokens = PLSQL.language
 
 describe("Parse MySQL tokens", () => {
   const parser = mysqlTokens.parser
@@ -52,5 +53,37 @@ describe("Parse BigQuery tokens", () => {
 
   it("parses bytes literals in double quotes", () => {
     ist(parser.parse('SELECT b"0101"'), 'Script(Statement(Keyword,Bytes))')
+  })
+})
+
+describe("Parse PL/SQL tokens", () => {
+  const parser = plsqlTokens.parser
+
+  it("parses alternative quoting mechanism - []", () => {
+    ist(parser.parse("SELECT q'[foo'bar]' FROM DUAL"), 'Script(Statement(Keyword,String,Keyword,Identifier))')
+  })
+
+  it("parses alternative quoting mechanism - {}", () => {
+    ist(parser.parse("SELECT q'{foo'bar}' FROM DUAL"), 'Script(Statement(Keyword,String,Keyword,Identifier))')
+  })
+
+  it("parses alternative quoting mechanism - <>", () => {
+    ist(parser.parse("SELECT q'<foo'bar>' FROM DUAL"), 'Script(Statement(Keyword,String,Keyword,Identifier))')
+  })
+
+  it("parses alternative quoting mechanism - ()", () => {
+    ist(parser.parse("SELECT q'(foo'bar)' FROM DUAL"), 'Script(Statement(Keyword,String,Keyword,Identifier))')
+  })
+
+  it("parses alternative quoting mechanism - custom", () => {
+    ist(parser.parse("SELECT q'~foo'bar~' FROM DUAL"), 'Script(Statement(Keyword,String,Keyword,Identifier))')
+  })
+
+  it("parses alternative quoting mechanism - uppercase Q", () => {
+    ist(parser.parse("SELECT Q'~foo'bar~' FROM DUAL"), 'Script(Statement(Keyword,String,Keyword,Identifier))')
+  })
+
+  it("parses alternative quoting mechanism - unclosed", () => {
+    ist(parser.parse("SELECT q'~foo'bar' FROM DUAL"), 'Script(Statement(Keyword,String))')
   })
 })

@@ -20,6 +20,7 @@ const enum Ch {
   Slash = 47,
   Colon = 58,
   Semi = 59,
+  LessThan = 60, GreaterThan = 62,
   Question = 63,
   At = 64,
   BracketL = 91, BracketR = 93,
@@ -33,6 +34,7 @@ const enum Ch {
   E = 69, e = 101,
   F = 70, f = 102,
   N = 78, n = 110,
+  Q = 81, q = 113,
   X = 88, x = 120,
   Z = 90, z = 122,
 
@@ -60,6 +62,24 @@ function readDoubleDollarLiteral(input: InputStream) {
   for (;;) {
     if (input.next < 0 || input.peek(1) < 0) return
     if (input.next == Ch.Dollar && input.peek(1) == Ch.Dollar ) { input.advance(2); return }
+    input.advance()
+  }
+}
+
+function readAlternativeQuotedLiteral(input: InputStream, openDelim: number) {
+  const closeDelim = {
+    [ Ch.BracketL ]: Ch.BracketR,     // []
+    [ Ch.BraceL ]: Ch.BraceR,         // {}
+    [ Ch.LessThan ]: Ch.GreaterThan,  // <>
+    [ Ch.ParenL ]: Ch.ParenR          // ()
+  }[ openDelim ] || openDelim;
+
+  for (;;) {
+    if (input.next < 0) return
+    if (input.next == closeDelim && input.peek(1) == Ch.SingleQuote) {
+      input.advance(2)
+      return
+    }
     input.advance()
   }
 }
@@ -138,6 +158,7 @@ export interface Dialect {
   unquotedBitLiterals: boolean,
   treatBitsAsBytes: boolean,
   charSetCasts: boolean,
+  alternativeQuotingMechanism: boolean,
   operatorChars: string,
   specialVar: string,
   identifierQuotes: string,
@@ -157,6 +178,7 @@ const defaults: Dialect = {
   unquotedBitLiterals: false,
   treatBitsAsBytes: false,
   charSetCasts: false,
+  alternativeQuotingMechanism: false,
   operatorChars: "*+\-%<>!=&|~^/",
   specialVar: "?",
   identifierQuotes: '"',
@@ -227,6 +249,13 @@ export function tokensFor(d: Dialect) {
         if (!isAlpha(input.next)) break
         input.advance()
       }
+    } else if ((next == Ch.q || next == Ch.Q) && input.next == Ch.SingleQuote &&
+                input.peek(1) > 0 && !inString(input.peek(1), Space) &&
+                d.alternativeQuotingMechanism) {
+      const openDelim = input.peek(1)
+      input.advance(2)
+      readAlternativeQuotedLiteral(input, openDelim)
+      input.acceptToken(StringToken)
     } else if (next == Ch.ParenL) {
       input.acceptToken(ParenL)
     } else if (next == Ch.ParenR) {
