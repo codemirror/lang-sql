@@ -1,3 +1,9 @@
+## 6.5.3 (2023-08-05)
+
+### Bug fixes
+
+The PL/SQL dialect now correctly handles `q'[]'`-quoting syntax.
+
 ## 6.5.2 (2023-06-23)
 
 ### Bug fixes
