@@ -20,7 +20,6 @@ const enum Ch {
   Slash = 47,
   Colon = 58,
   Semi = 59,
-  LessThan = 60, GreaterThan = 62,
   Question = 63,
   At = 64,
   BracketL = 91, BracketR = 93,
@@ -66,13 +65,9 @@ function readDoubleDollarLiteral(input: InputStream) {
   }
 }
 
-function readAlternativeQuotedLiteral(input: InputStream, openDelim: number) {
-  const closeDelim = {
-    [ Ch.BracketL ]: Ch.BracketR,     // []
-    [ Ch.BraceL ]: Ch.BraceR,         // {}
-    [ Ch.LessThan ]: Ch.GreaterThan,  // <>
-    [ Ch.ParenL ]: Ch.ParenR          // ()
-  }[ openDelim ] || openDelim;
+function readPLSQLQuotedLiteral(input: InputStream, openDelim: number) {
+  let matchingDelim = "[{<(".indexOf(String.fromCharCode(openDelim))
+  let closeDelim = matchingDelim < 0 ? openDelim : "]}>)".charCodeAt(matchingDelim)
 
   for (;;) {
     if (input.next < 0) return
@@ -158,7 +153,7 @@ export interface Dialect {
   unquotedBitLiterals: boolean,
   treatBitsAsBytes: boolean,
   charSetCasts: boolean,
-  alternativeQuotingMechanism: boolean,
+  plsqlQuotingMechanism: boolean,
   operatorChars: string,
   specialVar: string,
   identifierQuotes: string,
@@ -178,7 +173,7 @@ const defaults: Dialect = {
   unquotedBitLiterals: false,
   treatBitsAsBytes: false,
   charSetCasts: false,
-  alternativeQuotingMechanism: false,
+  plsqlQuotingMechanism: false,
   operatorChars: "*+\-%<>!=&|~^/",
   specialVar: "?",
   identifierQuotes: '"',
@@ -249,12 +244,12 @@ export function tokensFor(d: Dialect) {
         if (!isAlpha(input.next)) break
         input.advance()
       }
-    } else if ((next == Ch.q || next == Ch.Q) && input.next == Ch.SingleQuote &&
-                input.peek(1) > 0 && !inString(input.peek(1), Space) &&
-                d.alternativeQuotingMechanism) {
-      const openDelim = input.peek(1)
+    } else if (d.plsqlQuotingMechanism &&
+               (next == Ch.q || next == Ch.Q) && input.next == Ch.SingleQuote &&
+               input.peek(1) > 0 && !inString(input.peek(1), Space)) {
+      let openDelim = input.peek(1)
       input.advance(2)
-      readAlternativeQuotedLiteral(input, openDelim)
+      readPLSQLQuotedLiteral(input, openDelim)
       input.acceptToken(StringToken)
     } else if (next == Ch.ParenL) {
       input.acceptToken(ParenL)
