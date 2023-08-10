@@ -1,3 +1,9 @@
+## 6.5.4 (2023-08-10)
+
+### Bug fixes
+
+Remove use of negative lookbehind in a regular expression, which recent versions of Safari still don't support.
+
 ## 6.5.3 (2023-08-05)
 
 ### Bug fixes
