@@ -88,7 +88,7 @@ function getAliases(doc: Text, at: SyntaxNode) {
 
 function maybeQuoteCompletions(quote: string | null, completions: readonly Completion[]) {
   if (!quote) return completions
-  return completions.map(c => ({...c, label: quote + c.label + quote, apply: undefined}))
+  return completions.map(c => ({...c, label: c.label[0] == quote ? c.label : quote + c.label + quote, apply: undefined}))
 }
 
 const Span = /^\w*$/, QuotedSpan = /^[`'"]?\w*[`'"]?$/
@@ -115,7 +115,7 @@ class CompletionLevel {
 }
 
 function nameCompletion(label: string, type: string, idQuote: string): Completion {
-  if (!/[^\w\xb5-\uffff]/.test(label)) return {label, type}
+  if (/^[a-z_][a-z_\d]*$/.test(label)) return {label, type}
   return {label, type, apply: idQuote + label + idQuote}
 }
 
