@@ -1,3 +1,11 @@
+## 6.5.5 (2023-12-28)
+
+### Bug fixes
+
+Make sure table and column completions with upper-case characters are quoted.
+
+Tag comments and strings as isolating for the purpose of bidirectional text.
+
 ## 6.5.4 (2023-08-10)
 
 ### Bug fixes
