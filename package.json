@@ -27,6 +27,7 @@
   "license": "MIT",
   "dependencies": {
     "@codemirror/autocomplete": "^6.0.0",
+    "@lezer/common": "^1.2.0",
     "@lezer/highlight": "^1.0.0",
     "@codemirror/language": "^6.0.0",
     "@codemirror/state": "^6.0.0",

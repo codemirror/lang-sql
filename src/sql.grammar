@@ -32,9 +32,9 @@ element {
 
 @external tokens tokens from "./tokens" {
   whitespace
-  LineComment
-  BlockComment
-  String
+  LineComment[isolate]
+  BlockComment[isolate]
+  String[isolate]
   Number
   Bool
   Null
@@ -50,7 +50,7 @@ element {
   Punctuation
   SpecialVar
   Identifier
-  QuotedIdentifier
+  QuotedIdentifier[isolate]
   Keyword
   Type
   Bits
