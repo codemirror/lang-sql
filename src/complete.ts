@@ -97,19 +97,28 @@ class CompletionLevel {
   list: Completion[] = []
   children: {[name: string]: CompletionLevel} | undefined = undefined
 
-  child(name: string, idQuote: string) {
+  child(name: string, idQuote: string, type?: string) {
     let children = this.children || (this.children = Object.create(null))
     let found = children[name]
     if (found) return found
-    if (name) this.list.push(nameCompletion(name, "type", idQuote))
+    if (name) this.list.push(nameCompletion(name, type??"type", idQuote))
     return (children[name] = new CompletionLevel)
   }
 
-  addCompletions(list: readonly Completion[]) {
-    for (let option of list) {
+  addCompletion(option: Completion, replace=true) {
+    if(replace) {
       let found = this.list.findIndex(o => o.label == option.label)
-      if (found > -1) this.list[found] = option
-      else this.list.push(option)
+      if (found > -1) {
+        this.list[found] = option;
+        return;
+      }
+    }
+    this.list.push(option)
+  }
+
+  addCompletions(list: readonly Completion[], replace=true) {
+    for (let option of list) {
+      this.addCompletion(option, replace);
     }
   }
 }
@@ -119,24 +128,37 @@ function nameCompletion(label: string, type: string, idQuote: string): Completio
   return {label, type, apply: idQuote + label + idQuote}
 }
 
+function addObjectsToCompletions(top: CompletionLevel, idQuote: string, defaultSchema: CompletionLevel, objects: {[objectName: string]: readonly (string | Completion)[]}, replace=false, type?: string) {
+  for (let object in objects) {
+    let parts = object.replace(/\\?\./g, p => p == "." ? "\0" : p).split("\0")
+    let base = parts.length == 1 ? defaultSchema : top
+    for (let part of parts) base = base.child(part.replace(/\\\./g, "."), idQuote, type)
+    for (let option of objects[object]) if (option)
+        base.addCompletion(typeof option == "string" ? nameCompletion(option, "property", idQuote) : option, replace);
+  }
+}
+
 export function completeFromSchema(schema: {[table: string]: readonly (string | Completion)[]},
                                    tables?: readonly Completion[], schemas?: readonly Completion[],
+                                   objects?: {
+                                     [objectType: string]: {[objectName: string]: readonly (string | Completion)[]}
+                                   },
                                    defaultTableName?: string, defaultSchemaName?: string,
                                    dialect?: SQLDialect): CompletionSource {
   let top = new CompletionLevel
   let idQuote = dialect?.spec.identifierQuotes?.[0] || '"'
   let defaultSchema = top.child(defaultSchemaName || "", idQuote)
-  for (let table in schema) {
-    let parts = table.replace(/\\?\./g, p => p == "." ? "\0" : p).split("\0")
-    let base = parts.length == 1 ? defaultSchema : top
-    for (let part of parts) base = base.child(part.replace(/\\\./g, "."), idQuote)
-    for (let option of schema[table]) if (option)
-      base.list.push(typeof option == "string" ? nameCompletion(option, "property", idQuote) : option)
-  }
+  addObjectsToCompletions(top, idQuote, defaultSchema, schema, false);
   if (tables) defaultSchema.addCompletions(tables)
-  if (schemas) top.addCompletions(schemas)
-  top.addCompletions(defaultSchema.list)
+  if (schemas) top.addCompletions(schemas) 
   if (defaultTableName) top.addCompletions(defaultSchema.child(defaultTableName, idQuote).list)
+  // Add completion based on object types if any
+  if(objects) {
+    for(const objectType in objects) {
+      addObjectsToCompletions(top, idQuote, defaultSchema, objects[objectType], true, objectType);
+    }
+  }
+  top.addCompletions(defaultSchema.list)
 
   return (context: CompletionContext) => {
     let {parents, from, quoted, empty, aliases} = sourceContext(context.state, context.pos)

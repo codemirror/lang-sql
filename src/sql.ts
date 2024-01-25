@@ -133,6 +133,7 @@ export interface SQLConfig {
   /// for your schemas rather than using the generated ones, pass them
   /// here.
   schemas?: readonly Completion[],
+  objects?: {[objectType: string]: {[objectName: string]: readonly (string | Completion)[]}},
   /// When given, columns from the named table can be completed
   /// directly at the top level.
   defaultTable?: string,
@@ -159,7 +160,7 @@ export function keywordCompletion(dialect: SQLDialect, upperCase = false): Exten
 /// Returns a completion sources that provides schema-based completion
 /// for the given configuration.
 export function schemaCompletionSource(config: SQLConfig): CompletionSource {
-  return config.schema ? completeFromSchema(config.schema, config.tables, config.schemas,
+  return config.schema ? completeFromSchema(config.schema, config.tables, config.schemas, config.objects,
                                             config.defaultTable, config.defaultSchema,
                                             config.dialect || StandardSQL)
     : () => null

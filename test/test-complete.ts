@@ -39,12 +39,24 @@ describe("SQL completion", () => {
     ist(str(get("select u|", {schema: schema1})), "products, users")
   })
 
+  it("completes table names passed by objects key", () => {
+    ist(str(get("select u|", {schema: {}, objects: {
+      'type1': schema1,
+    }})), "products, users")
+  });
+
   it("completes quoted table names", () => {
     ist(str(get('select "u|', {schema: schema1})), '"products", "users"')
   })
 
   it("completes table names under schema", () => {
     ist(str(get("select public.u|", {schema: schema2})), "users")
+  })
+
+  it("completes table names under schema passed by objects key", () => {
+    ist(str(get("select public.u|", {schema: {}, objects: {
+      'type1': schema2,
+    }})), "users")
   })
 
   it("completes quoted table names under schema", () => {
@@ -59,6 +71,12 @@ describe("SQL completion", () => {
     ist(str(get("select users.|", {schema: schema1})), "address, id, name")
   })
 
+  it("completes column names passed by objects key", () => {
+    ist(str(get("select users.|", {schema: {}, objects: {
+      'type1': schema1,
+    }})), "address, id, name")
+  })
+
   it("completes quoted column names", () => {
     ist(str(get('select users."|', {schema: schema1})), '"address", "id", "name"')
   })
@@ -70,6 +88,15 @@ describe("SQL completion", () => {
   it("completes column names in tables for a specific schema", () => {
     ist(str(get("select public.users.|", {schema: schema2})), "email, id")
     ist(str(get("select other.users.|", {schema: schema2})), "id, name")
+  })
+
+  it("completes column names in tables for a specific schema passed by objects key", () => {
+    ist(str(get("select public.users.|", {schema: {}, objects: {
+      'type1': schema2,
+    }})), "email, id")
+    ist(str(get("select other.users.|", {schema: {}, objects: {
+      'type1': schema2,
+    }})), "id, name")
   })
 
   it("completes quoted column names in tables for a specific schema", () => {
@@ -174,5 +201,5 @@ describe("SQL completion", () => {
     let s = {schema: {"db\\.conf": ["abc"]}}
     ist(str(get("db|", s)), '"db.conf"')
     ist(str(get('"db.conf".|', s)), "abc")
-  })    
+  })
 })
