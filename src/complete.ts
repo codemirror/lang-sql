@@ -3,7 +3,7 @@ import {EditorState, Text} from "@codemirror/state"
 import {syntaxTree} from "@codemirror/language"
 import {SyntaxNode} from "@lezer/common"
 import {Type, Keyword} from "./sql.grammar.terms"
-import {type SQLDialect} from "./sql"
+import {type SQLDialect, SQLNamespace} from "./sql"
 
 function tokenBefore(tree: SyntaxNode) {
   let cursor = tree.cursor().moveTo(tree.from, -1)
@@ -93,23 +93,63 @@ function maybeQuoteCompletions(quote: string | null, completions: readonly Compl
 
 const Span = /^\w*$/, QuotedSpan = /^[`'"]?\w*[`'"]?$/
 
+function isSelfTag(namespace: SQLNamespace): namespace is {self: Completion, children: SQLNamespace} {
+  return (namespace as any).self && typeof (namespace as any).self.label == "string"
+}
+
 class CompletionLevel {
   list: Completion[] = []
   children: {[name: string]: CompletionLevel} | undefined = undefined
 
-  child(name: string, idQuote: string) {
+  constructor(readonly idQuote: string) {}
+
+  child(name: string) {
     let children = this.children || (this.children = Object.create(null))
     let found = children[name]
     if (found) return found
-    if (name) this.list.push(nameCompletion(name, "type", idQuote))
-    return (children[name] = new CompletionLevel)
+    if (name && !this.list.some(c => c.label == name)) this.list.push(nameCompletion(name, "type", this.idQuote))
+    return (children[name] = new CompletionLevel(this.idQuote))
   }
 
-  addCompletions(list: readonly Completion[]) {
-    for (let option of list) {
-      let found = this.list.findIndex(o => o.label == option.label)
-      if (found > -1) this.list[found] = option
-      else this.list.push(option)
+  maybeChild(name: string) {
+    return this.children ? this.children[name] : null
+  }    
+
+  addCompletion(option: Completion) {
+    let found = this.list.findIndex(o => o.label == option.label)
+    if (found > -1) this.list[found] = option
+    else this.list.push(option)
+  }
+
+  addCompletions(completions: readonly (Completion | string)[]) {
+    for (let option of completions)
+      this.addCompletion(typeof option == "string" ? nameCompletion(option, "property", this.idQuote) : option)
+  }
+
+  addNamespace(namespace: SQLNamespace, plainScope: CompletionLevel = this) {
+    if (Array.isArray(namespace)) {
+      this.addCompletions(namespace)
+    } else if (isSelfTag(namespace)) {
+      this.addNamespace(namespace.children)
+    } else {
+      this.addNamespaceObject(namespace as {[name: string]: SQLNamespace}, plainScope)
+    }
+  }
+
+  addNamespaceObject(namespace: {[name: string]: SQLNamespace}, plainScope: CompletionLevel) {
+    for (let name of Object.keys(namespace)) {
+      let children = namespace[name], self: Completion | null = null
+      let parts = name.replace(/\\?\./g, p => p == "." ? "\0" : p).split("\0")
+      let scope = parts.length == 1 ? plainScope : this
+      if (isSelfTag(children)) {
+        self = children.self
+        children = children.children
+      }
+      for (let i = 0; i < parts.length; i++) {
+        if (self && i == parts.length - 1) scope.addCompletion(self)
+        scope = scope.child(parts[i].replace(/\\\./g, "."))
+      }
+      scope.addNamespace(children)
     }
   }
 }
@@ -119,24 +159,22 @@ function nameCompletion(label: string, type: string, idQuote: string): Completio
   return {label, type, apply: idQuote + label + idQuote}
 }
 
-export function completeFromSchema(schema: {[table: string]: readonly (string | Completion)[]},
+// Some of this is more gnarly than it has to be because we're also
+// supporting the deprecated, not-so-well-considered style of
+// supplying the schema (dotted property names for schemas, separate
+// `tables` and `schemas` completions).
+export function completeFromSchema(schema: SQLNamespace,
                                    tables?: readonly Completion[], schemas?: readonly Completion[],
                                    defaultTableName?: string, defaultSchemaName?: string,
                                    dialect?: SQLDialect): CompletionSource {
-  let top = new CompletionLevel
   let idQuote = dialect?.spec.identifierQuotes?.[0] || '"'
-  let defaultSchema = top.child(defaultSchemaName || "", idQuote)
-  for (let table in schema) {
-    let parts = table.replace(/\\?\./g, p => p == "." ? "\0" : p).split("\0")
-    let base = parts.length == 1 ? defaultSchema : top
-    for (let part of parts) base = base.child(part.replace(/\\\./g, "."), idQuote)
-    for (let option of schema[table]) if (option)
-      base.list.push(typeof option == "string" ? nameCompletion(option, "property", idQuote) : option)
-  }
+  let top = new CompletionLevel(idQuote)
+  let defaultSchema = top.child(defaultSchemaName || "")
+  top.addNamespace(schema, defaultSchema)
   if (tables) defaultSchema.addCompletions(tables)
   if (schemas) top.addCompletions(schemas)
   top.addCompletions(defaultSchema.list)
-  if (defaultTableName) top.addCompletions(defaultSchema.child(defaultTableName, idQuote).list)
+  if (defaultTableName) top.addCompletions(defaultSchema.child(defaultTableName).list)
 
   return (context: CompletionContext) => {
     let {parents, from, quoted, empty, aliases} = sourceContext(context.state, context.pos)
@@ -146,10 +184,12 @@ export function completeFromSchema(schema: {[table: string]: readonly (string | 
     for (let name of parents) {
       while (!level.children || !level.children[name]) {
         if (level == top) level = defaultSchema
-        else if (level == defaultSchema && defaultTableName) level = level.child(defaultTableName, idQuote)
+        else if (level == defaultSchema && defaultTableName) level = level.child(defaultTableName)
         else return null
       }
-      level = level.child(name, idQuote)
+      let next = level.maybeChild(name)
+      if (!next) return null
+      level = next
     }
     let quoteAfter = quoted && context.state.sliceDoc(context.pos, context.pos + 1) == quoted
     let options = level.list

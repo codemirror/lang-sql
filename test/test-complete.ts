@@ -174,5 +174,34 @@ describe("SQL completion", () => {
     let s = {schema: {"db\\.conf": ["abc"]}}
     ist(str(get("db|", s)), '"db.conf"')
     ist(str(get('"db.conf".|', s)), "abc")
-  })    
+  })
+
+  it("supports nested schema declarations", () => {
+    let s = {schema: {
+      public: {users: ["email", "id"]},
+      other: {users: ["name", "id"]},
+      plain: ["one", "two"]
+    }}
+    ist(str(get("pl|", s)), "other, plain, public")
+    ist(str(get("plain.|", s)), "one, two")
+    ist(str(get("public.u|", s)), "users")
+    ist(str(get("public.users.e|", s)), "email, id")
+  })
+
+  it("supports self fields to specify table/schema completions", () => {
+    let s: SQLConfig = {schema: {
+      foo: {
+        self: {label: "foo", type: "keyword"},
+        children: {
+          bar: {
+            self: {label: "bar", type: "constant"},
+            children: ["a", "b"]
+          }
+        }
+      }
+    }}
+    ist(get("select f|", s)!.options[0].type, "keyword")
+    ist(get("select foo.|", s)!.options[0].type, "constant")
+    ist(get("select foo.|", s)!.options.length, 1)
+  })
 })

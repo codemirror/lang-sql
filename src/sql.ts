@@ -115,23 +115,27 @@ export class SQLDialect {
   }
 }
 
+/// The type used to describe a level of the schema for
+/// [completion](#lang-sql.SQLConfig.schema). Can be an array of
+/// options (columns), an object mapping table or schema names to
+/// deeper levels, or a `{self, children}` object that assigns a
+/// completion option to use for its parent property, when the default option
+/// (its name as label and type `"type"`) isn't suitable.
+export type SQLNamespace = {[name: string]: SQLNamespace}
+  | {self: Completion, children: SQLNamespace}
+  | readonly (Completion | string)[]
+
 /// Options used to configure an SQL extension.
 export interface SQLConfig {
   /// The [dialect](#lang-sql.SQLDialect) to use. Defaults to
   /// [`StandardSQL`](#lang-sql.StandardSQL).
   dialect?: SQLDialect,
-  /// An object that maps table names, optionally prefixed with a
-  /// schema name (`"schema.table"`) to options (columns) that can be
-  /// completed for that table. Use lower-case names here.
-  schema?: {[table: string]: readonly (string | Completion)[]},
-  /// By default, the completions for the table names will be
-  /// generated from the `schema` object. But if you want to
-  /// customize them, you can pass an array of completions through
-  /// this option.
+  /// You can use this to define the schemas, tables, and their fields
+  /// for autocompletion.
+  schema?: SQLNamespace,
+  /// @hide
   tables?: readonly Completion[],
-  /// Similar to `tables`, if you want to provide completion objects
-  /// for your schemas rather than using the generated ones, pass them
-  /// here.
+  /// @hide
   schemas?: readonly Completion[],
   /// When given, columns from the named table can be completed
   /// directly at the top level.
