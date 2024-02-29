@@ -1,3 +1,13 @@
+## 6.6.0 (2024-02-29)
+
+### Bug fixes
+
+Don't tokenize identifiers after periods as anything but plain identifiers.
+
+### New features
+
+The `schema` option now allows nested objects to define multiple levels of completions, as well as `self` completion options for specific levels. The old format (using `tables`/`schemas`) continues to work but is deprecated.
+
 ## 6.5.5 (2023-12-28)
 
 ### Bug fixes
