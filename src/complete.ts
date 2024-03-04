@@ -126,21 +126,21 @@ class CompletionLevel {
       this.addCompletion(typeof option == "string" ? nameCompletion(option, "property", this.idQuote) : option)
   }
 
-  addNamespace(namespace: SQLNamespace, plainScope: CompletionLevel = this) {
+  addNamespace(namespace: SQLNamespace) {
     if (Array.isArray(namespace)) {
       this.addCompletions(namespace)
     } else if (isSelfTag(namespace)) {
       this.addNamespace(namespace.children)
     } else {
-      this.addNamespaceObject(namespace as {[name: string]: SQLNamespace}, plainScope)
+      this.addNamespaceObject(namespace as {[name: string]: SQLNamespace})
     }
   }
 
-  addNamespaceObject(namespace: {[name: string]: SQLNamespace}, plainScope: CompletionLevel) {
+  addNamespaceObject(namespace: {[name: string]: SQLNamespace}) {
     for (let name of Object.keys(namespace)) {
       let children = namespace[name], self: Completion | null = null
       let parts = name.replace(/\\?\./g, p => p == "." ? "\0" : p).split("\0")
-      let scope = parts.length == 1 ? plainScope : this
+      let scope = this
       if (isSelfTag(children)) {
         self = children.self
         children = children.children
@@ -169,12 +169,12 @@ export function completeFromSchema(schema: SQLNamespace,
                                    dialect?: SQLDialect): CompletionSource {
   let idQuote = dialect?.spec.identifierQuotes?.[0] || '"'
   let top = new CompletionLevel(idQuote)
-  let defaultSchema = top.child(defaultSchemaName || "")
-  top.addNamespace(schema, defaultSchema)
-  if (tables) defaultSchema.addCompletions(tables)
+  let defaultSchema = defaultSchemaName ? top.child(defaultSchemaName) : null
+  top.addNamespace(schema)
+  if (tables) (defaultSchema || top).addCompletions(tables)
   if (schemas) top.addCompletions(schemas)
-  top.addCompletions(defaultSchema.list)
-  if (defaultTableName) top.addCompletions(defaultSchema.child(defaultTableName).list)
+  if (defaultSchema) top.addCompletions(defaultSchema.list)
+  if (defaultTableName) top.addCompletions((defaultSchema || top).child(defaultTableName).list)
 
   return (context: CompletionContext) => {
     let {parents, from, quoted, empty, aliases} = sourceContext(context.state, context.pos)
