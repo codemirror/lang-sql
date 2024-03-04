@@ -1,3 +1,9 @@
+## 6.6.1 (2024-03-04)
+
+### Bug fixes
+
+Fix an issue that caused completions to be missing when using the `defaultSchema` option.
+
 ## 6.6.0 (2024-02-29)
 
 ### Bug fixes
