@@ -57,11 +57,22 @@ function readLiteral(input: InputStream, endQuote: number, backslashEscapes: boo
   }
 }
 
-function readDoubleDollarLiteral(input: InputStream) {
-  for (;;) {
-    if (input.next < 0 || input.peek(1) < 0) return
-    if (input.next == Ch.Dollar && input.peek(1) == Ch.Dollar ) { input.advance(2); return }
-    input.advance()
+function readDoubleDollarLiteral(input: InputStream, tag: string) {
+  scan: for (;;) {
+    if (input.next < 0) return console.log("exit at end", input.pos)
+    if (input.next == Ch.Dollar) {
+      input.advance()
+      for (let i = 0; i < tag.length; i++) {
+        if (input.next != tag.charCodeAt(i)) continue scan
+        input.advance()
+      }
+      if (input.next == Ch.Dollar) {
+        input.advance()
+        return
+      }
+    } else {
+      input.advance()
+    }
   }
 }
 
@@ -195,9 +206,13 @@ export function tokensFor(d: Dialect) {
     if (inString(next, Space)) {
       while (inString(input.next, Space)) input.advance()
       input.acceptToken(whitespace)
-    } else if (next == Ch.Dollar && input.next == Ch.Dollar && d.doubleDollarQuotedStrings) {
-      readDoubleDollarLiteral(input)
-      input.acceptToken(StringToken)
+    } else if (next == Ch.Dollar) {
+      let tag = readWord(input, "")
+      if (input.next == Ch.Dollar) {
+        input.advance()
+        readDoubleDollarLiteral(input, tag)
+        input.acceptToken(StringToken)
+      }
     } else if (next == Ch.SingleQuote || next == Ch.DoubleQuote && d.doubleQuotedStrings) {
       readLiteral(input, next, d.backslashEscapes)
       input.acceptToken(StringToken)

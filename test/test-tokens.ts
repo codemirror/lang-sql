@@ -34,6 +34,10 @@ describe("Parse PostgreSQL tokens", () => {
   it("parses double dollar quoted string literals", () => {
     ist(parser.parse("SELECT $$hello$$"), 'Script(Statement(Keyword,String))')
   })
+
+  it("parses tagged double dollar quoted string literals", () => {
+    ist(parser.parse("SELECT $body$\nhello\n$body$"), 'Script(Statement(Keyword,String))')
+  })
 })
 
 describe("Parse BigQuery tokens", () => {
