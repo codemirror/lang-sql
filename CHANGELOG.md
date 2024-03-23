@@ -1,3 +1,9 @@
+## 6.6.2 (2024-03-23)
+
+### Bug fixes
+
+Properly support tags in PostgreSQL `4073` quoted strings.
+
 ## 6.6.1 (2024-03-04)
 
 ### Bug fixes
