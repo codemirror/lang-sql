@@ -206,7 +206,7 @@ export function tokensFor(d: Dialect) {
     if (inString(next, Space)) {
       while (inString(input.next, Space)) input.advance()
       input.acceptToken(whitespace)
-    } else if (next == Ch.Dollar) {
+    } else if (next == Ch.Dollar && d.doubleDollarQuotedStrings) {
       let tag = readWord(input, "")
       if (input.next == Ch.Dollar) {
         input.advance()
