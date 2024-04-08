@@ -1,3 +1,9 @@
+## 6.6.3 (2024-04-08)
+
+### Bug fixes
+
+Fix a bug where Postgres-style dollar-quoted strings were enabled for all dialects, and the `doubleDollarQuotedStrings` options was ignored.
+
 ## 6.6.2 (2024-03-23)
 
 ### Bug fixes
