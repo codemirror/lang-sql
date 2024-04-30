@@ -12,7 +12,7 @@ let parser = baseParser.configure({
       Statement: continuedIndent()
     }),
     foldNodeProp.add({
-      Statement(tree) { return {from: tree.firstChild!.to, to: tree.to} },
+      Statement(tree, state) { return {from: Math.min(tree.from + 100, state.doc.lineAt(tree.from).to), to: tree.to} },
       BlockComment(tree) { return {from: tree.from + 2, to: tree.to - 2} }
     }),
     styleTags({
