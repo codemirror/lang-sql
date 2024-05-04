@@ -183,7 +183,7 @@ export function completeFromSchema(schema: SQLNamespace,
     let level = top
     for (let name of parents) {
       while (!level.children || !level.children[name]) {
-        if (level == top) level = defaultSchema
+        if (level == top && defaultSchema) level = defaultSchema
         else if (level == defaultSchema && defaultTableName) level = level.child(defaultTableName)
         else return null
       }
