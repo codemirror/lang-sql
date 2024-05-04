@@ -1,3 +1,11 @@
+## 6.6.4 (2024-05-04)
+
+### Bug fixes
+
+Make statement folding leave the entire first line visible.
+
+Fix a null dereference in schema-based autocompletion.
+
 ## 6.6.3 (2024-04-08)
 
 ### Bug fixes
