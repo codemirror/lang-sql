@@ -1,3 +1,9 @@
+## 6.6.5 (2024-06-17)
+
+### Bug fixes
+
+Fix a bug that broke tokenizing of `e'\n'`-style strings.
+
 ## 6.6.4 (2024-05-04)
 
 ### Bug fixes
