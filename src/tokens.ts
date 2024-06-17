@@ -243,6 +243,7 @@ export function tokensFor(d: Dialect) {
     } else if ((next == Ch.e || next == Ch.E) && input.next == Ch.SingleQuote) {
       input.advance()
       readLiteral(input, Ch.SingleQuote, true)
+      input.acceptToken(StringToken)
     } else if ((next == Ch.n || next == Ch.N) && input.next == Ch.SingleQuote &&
                d.charSetCasts) {
       input.advance()
