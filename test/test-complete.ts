@@ -1,6 +1,6 @@
 import {EditorState} from "@codemirror/state"
 import {CompletionContext, CompletionResult, CompletionSource} from "@codemirror/autocomplete"
-import {schemaCompletionSource, PostgreSQL, MySQL, SQLConfig} from "@codemirror/lang-sql"
+import {schemaCompletionSource, PostgreSQL, MySQL, SQLConfig, SQLDialect} from "@codemirror/lang-sql"
 import ist from "ist"
 
 function get(doc: string, conf: SQLConfig & {explicit?: boolean} = {}) {
@@ -160,6 +160,15 @@ describe("SQL completion", () => {
         '"b c", "b-c", bup')
     ist(str(get("foo.b|", {schema: {foo: ["b c", "b-c", "bup"]}, dialect: MySQL})),
         '`b c`, `b-c`, bup')
+  })
+
+  it("adds identifiers for upper case completions", () => {
+    ist(str(get("foo.c|", {schema: {foo: ["Column", "cell"]}, dialect: PostgreSQL})),
+        '"Column", cell')
+
+    const customDialect = SQLDialect.define({...PostgreSQL.spec, identifierCaseInsensitive: true})
+    ist(str(get("foo.c|", {schema: {foo: ["Column", "cell"]}, dialect: customDialect})),
+        'Column, cell')
   })
 
   it("supports nesting more than two deep", () => {

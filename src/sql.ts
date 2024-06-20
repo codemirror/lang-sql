@@ -76,6 +76,10 @@ export type SQLDialectSpec = {
   /// The characters that can be used to quote identifiers. Defaults
   /// to `"\""`.
   identifierQuotes?: string
+  /// Controls whether identifiers are case-insensitive. Identifiers
+  /// with upper-case letters are quoted then set to false. Defaults to
+  /// false.
+  identifierCaseInsensitive?: boolean,
   /// Controls whether bit values can be defined as 0b1010. Defaults
   /// to false.
   unquotedBitLiterals?: boolean,
