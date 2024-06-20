@@ -101,14 +101,14 @@ class CompletionLevel {
   list: Completion[] = []
   children: {[name: string]: CompletionLevel} | undefined = undefined
 
-  constructor(readonly idQuote: string) {}
+  constructor(readonly idQuote: string, readonly idCaseInsensitive?: boolean) {}
 
   child(name: string) {
     let children = this.children || (this.children = Object.create(null))
     let found = children[name]
     if (found) return found
-    if (name && !this.list.some(c => c.label == name)) this.list.push(nameCompletion(name, "type", this.idQuote))
-    return (children[name] = new CompletionLevel(this.idQuote))
+    if (name && !this.list.some(c => c.label == name)) this.list.push(nameCompletion(name, "type", this.idQuote, this.idCaseInsensitive))
+    return (children[name] = new CompletionLevel(this.idQuote, this.idCaseInsensitive))
   }
 
   maybeChild(name: string) {
@@ -123,7 +123,7 @@ class CompletionLevel {
 
   addCompletions(completions: readonly (Completion | string)[]) {
     for (let option of completions)
-      this.addCompletion(typeof option == "string" ? nameCompletion(option, "property", this.idQuote) : option)
+      this.addCompletion(typeof option == "string" ? nameCompletion(option, "property", this.idQuote, this.idCaseInsensitive) : option)
   }
 
   addNamespace(namespace: SQLNamespace) {
@@ -154,8 +154,9 @@ class CompletionLevel {
   }
 }
 
-function nameCompletion(label: string, type: string, idQuote: string): Completion {
-  if (/^[a-z_][a-z_\d]*$/.test(label)) return {label, type}
+function nameCompletion(label: string, type: string, idQuote: string, idCaseInsensitive: boolean): Completion {
+  const regex = new RegExp("^[a-z_][a-z_\\d]*$", idCaseInsensitive ? 'i' : undefined);
+  if (regex.test(label)) return {label, type}
   return {label, type, apply: idQuote + label + idQuote}
 }
 
@@ -168,7 +169,7 @@ export function completeFromSchema(schema: SQLNamespace,
                                    defaultTableName?: string, defaultSchemaName?: string,
                                    dialect?: SQLDialect): CompletionSource {
   let idQuote = dialect?.spec.identifierQuotes?.[0] || '"'
-  let top = new CompletionLevel(idQuote)
+  let top = new CompletionLevel(idQuote, dialect?.spec.identifierCaseInsensitive)
   let defaultSchema = defaultSchemaName ? top.child(defaultSchemaName) : null
   top.addNamespace(schema)
   if (tables) (defaultSchema || top).addCompletions(tables)
