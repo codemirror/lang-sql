@@ -171,7 +171,7 @@ to <code>&quot;\&quot;&quot;</code>.</p>
 </dd><dt id="user-content-sqldialectspec.identifiercaseinsensitive">
   <code><strong><a href="#user-content-sqldialectspec.identifiercaseinsensitive">identifiercaseinsensitive</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
-<dd><p>Controls whether identifiers are case-insensitive. Identifiers with upper case letters are quoted then set to false. Defaults
+<dd><p>Controls whether identifiers are case-insensitive. Identifiers with upper-case letters are quoted then set to false. Defaults
 to <code>false</code>.</p>
 </dd><dt id="user-content-sqldialectspec.unquotedbitliterals">
   <code><strong><a href="#user-content-sqldialectspec.unquotedbitliterals">unquotedBitLiterals</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
