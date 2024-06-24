@@ -1,3 +1,9 @@
+## 6.7.0 (2024-06-24)
+
+### New features
+
+Dialects can now disable quoting of identifiers containing upper-case characters with the `caseInsensitiveIdentifiers` option.
+
 ## 6.6.5 (2024-06-17)
 
 ### Bug fixes
