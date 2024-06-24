@@ -166,7 +166,7 @@ describe("SQL completion", () => {
     ist(str(get("foo.c|", {schema: {foo: ["Column", "cell"]}, dialect: PostgreSQL})),
         '"Column", cell')
 
-    const customDialect = SQLDialect.define({...PostgreSQL.spec, identifierCaseInsensitive: true})
+    const customDialect = SQLDialect.define({...PostgreSQL.spec, caseInsensitiveIdentifiers: true})
     ist(str(get("foo.c|", {schema: {foo: ["Column", "cell"]}, dialect: customDialect})),
         'Column, cell')
   })

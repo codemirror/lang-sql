@@ -101,7 +101,7 @@ class CompletionLevel {
   list: Completion[] = []
   children: {[name: string]: CompletionLevel} | undefined = undefined
 
-  constructor(readonly idQuote: string, readonly idCaseInsensitive?: boolean) {}
+  constructor(readonly idQuote: string, readonly idCaseInsensitive: boolean) {}
 
   child(name: string) {
     let children = this.children || (this.children = Object.create(null))
@@ -155,8 +155,7 @@ class CompletionLevel {
 }
 
 function nameCompletion(label: string, type: string, idQuote: string, idCaseInsensitive: boolean): Completion {
-  const regex = new RegExp("^[a-z_][a-z_\\d]*$", idCaseInsensitive ? 'i' : undefined);
-  if (regex.test(label)) return {label, type}
+  if ((new RegExp("^[a-z_][a-z_\\d]*$", idCaseInsensitive ? "i" : "")).test(label)) return {label, type}
   return {label, type, apply: idQuote + label + idQuote}
 }
 
@@ -169,7 +168,7 @@ export function completeFromSchema(schema: SQLNamespace,
                                    defaultTableName?: string, defaultSchemaName?: string,
                                    dialect?: SQLDialect): CompletionSource {
   let idQuote = dialect?.spec.identifierQuotes?.[0] || '"'
-  let top = new CompletionLevel(idQuote, dialect?.spec.identifierCaseInsensitive)
+  let top = new CompletionLevel(idQuote, !!dialect?.spec.caseInsensitiveIdentifiers)
   let defaultSchema = defaultSchemaName ? top.child(defaultSchemaName) : null
   top.addNamespace(schema)
   if (tables) (defaultSchema || top).addCompletions(tables)

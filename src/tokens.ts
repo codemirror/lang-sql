@@ -168,7 +168,7 @@ export interface Dialect {
   operatorChars: string,
   specialVar: string,
   identifierQuotes: string,
-  identifierCaseInsensitive: boolean,
+  caseInsensitiveIdentifiers: boolean,
   words: {[name: string]: number}
 }
 
@@ -189,7 +189,7 @@ const defaults: Dialect = {
   operatorChars: "*+\-%<>!=&|~^/",
   specialVar: "?",
   identifierQuotes: '"',
-  identifierCaseInsensitive: false,
+  caseInsensitiveIdentifiers: false,
   words: keywords(SQLKeywords, SQLTypes)
 }
 

@@ -77,9 +77,9 @@ export type SQLDialectSpec = {
   /// to `"\""`.
   identifierQuotes?: string
   /// Controls whether identifiers are case-insensitive. Identifiers
-  /// with upper-case letters are quoted then set to false. Defaults to
-  /// false.
-  identifierCaseInsensitive?: boolean,
+  /// with upper-case letters are quoted when set to false (which is
+  /// the default).
+  caseInsensitiveIdentifiers?: boolean,
   /// Controls whether bit values can be defined as 0b1010. Defaults
   /// to false.
   unquotedBitLiterals?: boolean,

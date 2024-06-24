@@ -42,24 +42,10 @@ extensions.</p>
 <dd><p>The <a href="#user-content-sqldialect">dialect</a> to use. Defaults to
 <a href="#user-content-standardsql"><code>StandardSQL</code></a>.</p>
 </dd><dt id="user-content-sqlconfig.schema">
-  <code><strong><a href="#user-content-sqlconfig.schema">schema</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>&lt;readonly (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>)[]&gt;</code></dt>
+  <code><strong><a href="#user-content-sqlconfig.schema">schema</a></strong>&#8288;?: <a href="#user-content-sqlnamespace">SQLNamespace</a></code></dt>
 
-<dd><p>An object that maps table names, optionally prefixed with a
-schema name (<code>&quot;schema.table&quot;</code>) to options (columns) that can be
-completed for that table. Use lower-case names here.</p>
-</dd><dt id="user-content-sqlconfig.tables">
-  <code><strong><a href="#user-content-sqlconfig.tables">tables</a></strong>&#8288;?: readonly <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>[]</code></dt>
-
-<dd><p>By default, the completions for the table names will be
-generated from the <code>schema</code> object. But if you want to
-customize them, you can pass an array of completions through
-this option.</p>
-</dd><dt id="user-content-sqlconfig.schemas">
-  <code><strong><a href="#user-content-sqlconfig.schemas">schemas</a></strong>&#8288;?: readonly <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>[]</code></dt>
-
-<dd><p>Similar to <code>tables</code>, if you want to provide completion objects
-for your schemas rather than using the generated ones, pass them
-here.</p>
+<dd><p>You can use this to define the schemas, tables, and their fields
+for autocompletion.</p>
 </dd><dt id="user-content-sqlconfig.defaulttable">
   <code><strong><a href="#user-content-sqlconfig.defaulttable">defaultTable</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
@@ -76,6 +62,19 @@ completed directly at the top level.</p>
 <dd><p>When set to true, keyword completions will be upper-case.</p>
 </dd></dl>
 
+</dd>
+<dt id="user-content-sqlnamespace">
+  <code>
+    type
+    <strong><a href="#user-content-sqlnamespace">SQLNamespace</a></strong> = <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>&lt;<a href="#user-content-sqlnamespace">SQLNamespace</a>&gt; | {self: <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>, children: <a href="#user-content-sqlnamespace">SQLNamespace</a>} | readonly (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>)[]</code>
+</dt>
+
+<dd><p>The type used to describe a level of the schema for
+<a href="#user-content-sqlconfig.schema">completion</a>. Can be an array of
+options (columns), an object mapping table or schema names to
+deeper levels, or a <code>{self, children}</code> object that assigns a
+completion option to use for its parent property, when the default option
+(its name as label and type <code>&quot;type&quot;</code>) isn't suitable.</p>
 </dd>
 <dt id="user-content-sqldialect">
   <h4>
@@ -153,6 +152,11 @@ strings, rather than identifiers.</p>
   <code><strong><a href="#user-content-sqldialectspec.charsetcasts">charSetCasts</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
 <dd><p>Enables strings like <code>_utf8'str'</code> or <code>N'str'</code>.</p>
+</dd><dt id="user-content-sqldialectspec.plsqlquotingmechanism">
+  <code><strong><a href="#user-content-sqldialectspec.plsqlquotingmechanism">plsqlQuotingMechanism</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+
+<dd><p>Enables string quoting syntax like <code>q'[str]'</code>, as used in
+PL/SQL.</p>
 </dd><dt id="user-content-sqldialectspec.operatorchars">
   <code><strong><a href="#user-content-sqldialectspec.operatorchars">operatorChars</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
@@ -168,11 +172,12 @@ Defaults to <code>&quot;?&quot;</code>.</p>
 
 <dd><p>The characters that can be used to quote identifiers. Defaults
 to <code>&quot;\&quot;&quot;</code>.</p>
-</dd><dt id="user-content-sqldialectspec.identifiercaseinsensitive">
-  <code><strong><a href="#user-content-sqldialectspec.identifiercaseinsensitive">identifiercaseinsensitive</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
+</dd><dt id="user-content-sqldialectspec.caseinsensitiveidentifiers">
+  <code><strong><a href="#user-content-sqldialectspec.caseinsensitiveidentifiers">caseInsensitiveIdentifiers</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
-<dd><p>Controls whether identifiers are case-insensitive. Identifiers with upper-case letters are quoted then set to false. Defaults
-to <code>false</code>.</p>
+<dd><p>Controls whether identifiers are case-insensitive. Identifiers
+with upper-case letters are quoted when set to false (which is
+the default).</p>
 </dd><dt id="user-content-sqldialectspec.unquotedbitliterals">
   <code><strong><a href="#user-content-sqldialectspec.unquotedbitliterals">unquotedBitLiterals</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
