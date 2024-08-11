@@ -59,7 +59,7 @@ function readLiteral(input: InputStream, endQuote: number, backslashEscapes: boo
 
 function readDoubleDollarLiteral(input: InputStream, tag: string) {
   scan: for (;;) {
-    if (input.next < 0) return console.log("exit at end", input.pos)
+    if (input.next < 0) return
     if (input.next == Ch.Dollar) {
       input.advance()
       for (let i = 0; i < tag.length; i++) {
