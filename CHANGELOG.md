@@ -1,3 +1,9 @@
+## 6.7.1 (2024-08-21)
+
+### Bug fixes
+
+Remove single-letter words from the list of Postgres keywords, since they interfere with alias-based autocompletion.
+
 ## 6.7.0 (2024-06-24)
 
 ### New features
