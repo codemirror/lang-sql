@@ -1,6 +1,6 @@
 import {continuedIndent, indentNodeProp, foldNodeProp, LRLanguage, LanguageSupport} from "@codemirror/language"
 import {Extension} from "@codemirror/state"
-import {Completion, CompletionSource} from "@codemirror/autocomplete"
+import {Completion, CompletionSection, CompletionSource} from "@codemirror/autocomplete"
 import {styleTags, tags as t} from "@lezer/highlight"
 import {parser as baseParser} from "./sql.grammar"
 import {tokens, Dialect, tokensFor, SQLKeywords, SQLTypes, dialect} from "./tokens"
@@ -148,18 +148,22 @@ export interface SQLConfig {
   /// completed directly at the top level.
   defaultSchema?: string,
   /// When set to true, keyword completions will be upper-case.
-  upperCaseKeywords?: boolean
+  upperCaseKeywords?: boolean,
+  /// When given, keyword completions will be placed in this section.
+  keywordsSection?: string | CompletionSection,
+  /// When given, keyword completions will be mapped using this function.
+  keywordsMapper?: (keywords: Completion[]) => Completion[]
 }
 
 /// Returns a completion source that provides keyword completion for
 /// the given SQL dialect.
-export function keywordCompletionSource(dialect: SQLDialect, upperCase = false): CompletionSource {
-  return completeKeywords(dialect.dialect.words, upperCase)
+export function keywordCompletionSource(dialect: SQLDialect, upperCase = false, section?: string | CompletionSection, mapper?: (keywords: Completion[]) => Completion[]): CompletionSource {
+  return completeKeywords(dialect.dialect.words, upperCase, section, mapper)
 }
 
-function keywordCompletion(dialect: SQLDialect, upperCase = false): Extension {
+function keywordCompletion(dialect: SQLDialect, upperCase = false, section?: string | CompletionSection, mapper?: (keywords: Completion[]) => Completion[]): Extension {
   return dialect.language.data.of({
-    autocomplete: keywordCompletionSource(dialect, upperCase)
+    autocomplete: keywordCompletionSource(dialect, upperCase, section, mapper)
   })
 }
 
@@ -183,7 +187,7 @@ function schemaCompletion(config: SQLConfig): Extension {
 /// extensions.
 export function sql(config: SQLConfig = {}) {
   let lang = config.dialect || StandardSQL
-  return new LanguageSupport(lang.language, [schemaCompletion(config), keywordCompletion(lang, !!config.upperCaseKeywords)])
+  return new LanguageSupport(lang.language, [schemaCompletion(config), keywordCompletion(lang, !!config.upperCaseKeywords, config.keywordsSection, config.keywordsMapper)])
 }
 
 /// The standard SQL dialect.
