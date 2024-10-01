@@ -204,12 +204,14 @@ export function completeFromSchema(schema: SQLNamespace,
   }
 }
 
-export function completeKeywords(keywords: {[name: string]: number}, upperCase: boolean) {
-  let completions =  Object.keys(keywords).map(keyword => ({
-    label: upperCase ? keyword.toUpperCase() : keyword,
-    type: keywords[keyword] == Type ? "type" : keywords[keyword] == Keyword ? "keyword" : "variable",
-    boost: -1
-  }))
+function completionType(tokenType: number) {
+  return tokenType == Type ? "type" : tokenType == Keyword ? "keyword" : "variable"
+}
+
+export function completeKeywords(keywords: {[name: string]: number}, upperCase: boolean,
+                                 build: (name: string, type: string) => Completion) {
+  let completions =  Object.keys(keywords)
+    .map(keyword => build(upperCase ? keyword.toUpperCase() : keyword, completionType(keywords[keyword])))
   return ifNotIn(["QuotedIdentifier", "SpecialVar", "String", "LineComment", "BlockComment", "."],
                  completeFromList(completions))
 }

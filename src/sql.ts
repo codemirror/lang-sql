@@ -149,18 +149,17 @@ export interface SQLConfig {
   defaultSchema?: string,
   /// When set to true, keyword completions will be upper-case.
   upperCaseKeywords?: boolean
+  /// Can be used to customize the completions generated for keywords.
+  keywordCompletion?: (label: string, type: string) => Completion
 }
+
+function defaultKeyword(label: string, type: string) { return {label, type, boost: -1} }
 
 /// Returns a completion source that provides keyword completion for
 /// the given SQL dialect.
-export function keywordCompletionSource(dialect: SQLDialect, upperCase = false): CompletionSource {
-  return completeKeywords(dialect.dialect.words, upperCase)
-}
-
-function keywordCompletion(dialect: SQLDialect, upperCase = false): Extension {
-  return dialect.language.data.of({
-    autocomplete: keywordCompletionSource(dialect, upperCase)
-  })
+export function keywordCompletionSource(dialect: SQLDialect, upperCase = false,
+                                        build?: (label: string, type: string) => Completion): CompletionSource {
+  return completeKeywords(dialect.dialect.words, upperCase, build || defaultKeyword)
 }
 
 /// Returns a completion sources that provides schema-based completion
@@ -183,7 +182,12 @@ function schemaCompletion(config: SQLConfig): Extension {
 /// extensions.
 export function sql(config: SQLConfig = {}) {
   let lang = config.dialect || StandardSQL
-  return new LanguageSupport(lang.language, [schemaCompletion(config), keywordCompletion(lang, !!config.upperCaseKeywords)])
+  return new LanguageSupport(lang.language, [
+    schemaCompletion(config),
+    lang.language.data.of({
+      autocomplete: keywordCompletionSource(lang, config.upperCaseKeywords, config.keywordCompletion)
+    })
+  ])
 }
 
 /// The standard SQL dialect.

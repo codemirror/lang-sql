@@ -1,16 +1,18 @@
 import {EditorState} from "@codemirror/state"
 import {CompletionContext, CompletionResult, CompletionSource} from "@codemirror/autocomplete"
-import {schemaCompletionSource, PostgreSQL, MySQL, SQLConfig, SQLDialect} from "@codemirror/lang-sql"
+import {schemaCompletionSource, keywordCompletionSource, PostgreSQL, MySQL, SQLConfig, SQLDialect} from "@codemirror/lang-sql"
 import ist from "ist"
 
-function get(doc: string, conf: SQLConfig & {explicit?: boolean} = {}) {
+function get(doc: string, conf: SQLConfig & {explicit?: boolean, keywords?: boolean} = {}) {
   let cur = doc.indexOf("|"), dialect = conf.dialect || PostgreSQL
   doc = doc.slice(0, cur) + doc.slice(cur + 1)
   let state = EditorState.create({
     doc,
     selection: {anchor: cur},
     extensions: [dialect, dialect.language.data.of({
-      autocomplete: schemaCompletionSource(Object.assign({dialect}, conf))
+      autocomplete: conf.keywords
+        ? keywordCompletionSource(dialect, conf.upperCaseKeywords, conf.keywordCompletion)
+        : schemaCompletionSource(Object.assign({dialect}, conf))
     })]
   })
   let result = state.languageDataAt<CompletionSource>("autocomplete", cur)[0](new CompletionContext(state, cur, !!conf.explicit))
@@ -212,5 +214,17 @@ describe("SQL completion", () => {
     ist(get("select f|", s)!.options[0].type, "keyword")
     ist(get("select foo.|", s)!.options[0].type, "constant")
     ist(get("select foo.|", s)!.options.length, 1)
+  })
+
+  it("can complete keywords", () => {
+    ist(get("s|", {keywords: true})!.options.some(c => c.label == "select"))
+  })
+
+  it("can complete upper-case keywords", () => {
+    ist(get("s|", {keywords: true, upperCaseKeywords: true})!.options.some(c => c.label == "SELECT"))
+  })
+
+  it("can transform keyword completions", () => {
+    ist(get("s|", {keywords: true, keywordCompletion: l => ({label: l, type: "x"})})!.options.every(c => c.type == "x"))
   })
 })
