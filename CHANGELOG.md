@@ -1,3 +1,9 @@
+## 6.8.0 (2024-10-01)
+
+### New features
+
+The new `keywordCompletion` option can be used to define what kind of completions are generated for keywords.
+
 ## 6.7.1 (2024-08-21)
 
 ### Bug fixes
