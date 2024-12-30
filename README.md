@@ -19,6 +19,22 @@ we have a [code of
 conduct](http://contributor-covenant.org/version/1/1/0/) that applies
 to communication around the project.
 
+## Usage
+
+```javascript
+import {EditorView, basicSetup} from "codemirror"
+import {sql} from "@codemirror/lang-sql"
+
+const view = new EditorView({
+  parent: document.body,
+  doc: `select * from users where age > 20`,
+  extensions: [basicSetup, sql()]
+})
+```
+
+Use `sql({dialect: PostgreSQL})` or similar to select a specific SQL
+dialect.
+
 ## API Reference
 
 <dl>
@@ -60,6 +76,10 @@ completed directly at the top level.</p>
   <code><strong><a href="#user-content-sqlconfig.uppercasekeywords">upperCaseKeywords</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
 <dd><p>When set to true, keyword completions will be upper-case.</p>
+</dd><dt id="user-content-sqlconfig.keywordcompletion">
+  <code><strong><a href="#user-content-sqlconfig.keywordcompletion">keywordCompletion</a></strong>&#8288;?: fn(<a id="user-content-sqlconfig.keywordcompletion^label" href="#user-content-sqlconfig.keywordcompletion^label">label</a>: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, <a id="user-content-sqlconfig.keywordcompletion^type" href="#user-content-sqlconfig.keywordcompletion^type">type</a>: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>) → <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a></code></dt>
+
+<dd><p>Can be used to customize the completions generated for keywords.</p>
 </dd></dl>
 
 </dd>
@@ -234,7 +254,7 @@ Server</a>.</p>
 <dd><p><a href="https://en.wikipedia.org/wiki/PL/SQL">PL/SQL</a> dialect.</p>
 </dd>
 <dt id="user-content-keywordcompletionsource">
-  <code><strong><a href="#user-content-keywordcompletionsource">keywordCompletionSource</a></strong>(<a id="user-content-keywordcompletionsource^dialect" href="#user-content-keywordcompletionsource^dialect">dialect</a>: <a href="#user-content-sqldialect">SQLDialect</a>, <a id="user-content-keywordcompletionsource^uppercase" href="#user-content-keywordcompletionsource^uppercase">upperCase</a>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a> = false) → <a href="https://codemirror.net/docs/ref#autocomplete.CompletionSource">CompletionSource</a></code></dt>
+  <code><strong><a href="#user-content-keywordcompletionsource">keywordCompletionSource</a></strong>(<a id="user-content-keywordcompletionsource^dialect" href="#user-content-keywordcompletionsource^dialect">dialect</a>: <a href="#user-content-sqldialect">SQLDialect</a>, <a id="user-content-keywordcompletionsource^uppercase" href="#user-content-keywordcompletionsource^uppercase">upperCase</a>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a> = false, <a id="user-content-keywordcompletionsource^build" href="#user-content-keywordcompletionsource^build">build</a>&#8288;?: fn(<a id="user-content-keywordcompletionsource^build^label" href="#user-content-keywordcompletionsource^build^label">label</a>: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, <a id="user-content-keywordcompletionsource^build^type" href="#user-content-keywordcompletionsource^build^type">type</a>: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>) → <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>) → <a href="https://codemirror.net/docs/ref#autocomplete.CompletionSource">CompletionSource</a></code></dt>
 
 <dd><p>Returns a completion source that provides keyword completion for
 the given SQL dialect.</p>

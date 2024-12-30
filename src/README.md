@@ -19,6 +19,22 @@ we have a [code of
 conduct](http://contributor-covenant.org/version/1/1/0/) that applies
 to communication around the project.
 
+## Usage
+
+```javascript
+import {EditorView, basicSetup} from "codemirror"
+import {sql} from "@codemirror/lang-sql"
+
+const view = new EditorView({
+  parent: document.body,
+  doc: `select * from users where age > 20`,
+  extensions: [basicSetup, sql()]
+})
+```
+
+Use `sql({dialect: PostgreSQL})` or similar to select a specific SQL
+dialect.
+
 ## API Reference
 
 @sql
