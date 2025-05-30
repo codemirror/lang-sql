@@ -2,6 +2,7 @@ import {continuedIndent, indentNodeProp, foldNodeProp, LRLanguage, LanguageSuppo
 import {Extension} from "@codemirror/state"
 import {Completion, CompletionSource} from "@codemirror/autocomplete"
 import {styleTags, tags as t} from "@lezer/highlight"
+import {ParserConfig} from "@lezer/lr"
 import {parser as baseParser} from "./sql.grammar"
 import {tokens, Dialect, tokensFor, SQLKeywords, SQLTypes, dialect} from "./tokens"
 import {completeFromSchema, completeKeywords} from "./complete"
@@ -101,6 +102,12 @@ export class SQLDialect {
 
   /// Returns the language for this dialect as an extension.
   get extension() { return this.language.extension }
+
+  /// Reconfigure the parser used by this dialect. Returns a new
+  /// dialect object.
+  configureLanguage(options: ParserConfig, name?: string) {
+    return new SQLDialect(this.dialect, this.language.configure(options, name), this.spec)
+  }
 
   /// Define a new dialect.
   static define(spec: SQLDialectSpec) {
