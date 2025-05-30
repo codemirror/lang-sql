@@ -1,3 +1,9 @@
+## 6.9.0 (2025-05-30)
+
+### New features
+
+The new `SQLDialect.configureLanguage` method can be used to configure the language (and it's syntax node props) used by a dialect.
+
 ## 6.8.0 (2024-10-01)
 
 ### New features
