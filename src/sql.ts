@@ -249,10 +249,78 @@ export const MariaSQL = SQLDialect.define({
 
 /// SQL dialect for Microsoft [SQL
 /// Server](https://www.microsoft.com/en-us/sql-server).
+let MSSQLBuiltin = (
+  /* Aggregate https://msdn.microsoft.com/en-us/library/ms173454.aspx */
+  "APPROX_COUNT_DISTINCT APPROX_PERCENTILE_CONT APPROX_PERCENTILE_DISC AVG CHECKSUM_AGG COUNT COUNT_BIG GROUPING GROUPING_ID MAX MIN PRODUCT STDEV STDEVP SUM VAR VARP" +
+  /* AI https://learn.microsoft.com/en-us/sql/t-sql/functions/ai-functions-transact-sql?view=sql-server-ver17 */
+  "AI_GENERATE_EMBEDDINGS AI_GENERATE_CHUNKS" +
+  /* Analytic https://learn.microsoft.com/en-us/sql/t-sql/functions/analytic-functions-transact-sql?view=sql-server-ver17 */
+  "CUME_DIST FIRST_VALUE LAG LAST_VALUE LEAD PERCENTILE_CONT PERCENTILE_DISC PERCENT_RANK" +
+  /* Bit Manipulation https://learn.microsoft.com/en-us/sql/t-sql/functions/bit-manipulation-functions-overview?view=sql-server-ver17 */
+  "LEFT_SHIFT RIGHT_SHIFT BIT_COUNT GET_BIT SET_BIT" +
+  /* Collation Functions https://learn.microsoft.com/en-us/sql/t-sql/functions/collation-functions-collationproperty-transact-sql?view=sql-server-ver17 */
+  "COLLATIONPROPERTY TERTIARY_WEIGHTS" +
+  /* Configuration https://learn.microsoft.com/en-us/sql/t-sql/functions/configuration-functions-transact-sql?view=sql-server-ver17 */
+  "@@DATEFIRST @@DBTS @@LANGID @@LANGUAGE @@LOCK_TIMEOUT @@MAX_CONNECTIONS @@MAX_PRECISION @@NESTLEVEL @@OPTIONS @@REMSERVER @@SERVERNAME @@SERVICENAME @@SPID @@TEXTSIZE @@VERSION" +
+  /* Conversion https://learn.microsoft.com/en-us/sql/t-sql/functions/conversion-functions-transact-sql?view=sql-server-ver17*/
+  "CAST CONVERT PARSE TRY_CAST TRY_CONVERT TRY_PARSE" +
+  /* Cryptographic https://learn.microsoft.com/en-us/sql/t-sql/functions/cryptographic-functions-transact-sql?view=sql-server-ver17*/
+  "ASYMKEY_ID ASYMKEYPROPERTY CERTPROPERTY CERT_ID CRYPT_GEN_RANDOM DECRYPTBYASYMKEY DECRYPTBYCERT DECRYPTBYKEY DECRYPTBYKEYAUTOASYMKEY DECRYPTBYKEYAUTOCERT DECRYPTBYPASSPHRASE ENCRYPTBYASYMKEY ENCRYPTBYCERT ENCRYPTBYKEY ENCRYPTBYPASSPHRASE HASHBYTES IS_OBJECTSIGNED KEY_GUID KEY_ID KEY_NAME SIGNBYASYMKEY SIGNBYCERT SYMKEYPROPERTY VERIFYSIGNEDBYCERT VERIFYSIGNEDBYASYMKEY" +
+  /* Cursor https://learn.microsoft.com/en-us/sql/t-sql/functions/cursor-functions-transact-sql?view=sql-server-ver17 */
+  "@@CURSOR_ROWS @@FETCH_STATUS CURSOR_STATUS" +
+  /* Data type https://learn.microsoft.com/en-us/sql/t-sql/functions/data-type-functions-transact-sql?view=sql-server-ver17 */
+  "DATALENGTH IDENT_CURRENT IDENT_INCR IDENT_SEED IDENTITY SQL_VARIANT_PROPERTY" +
+  /* Date & time https://learn.microsoft.com/en-us/sql/t-sql/functions/date-and-time-data-types-and-functions-transact-sql?view=sql-server-ver17 */
+  "@@DATEFIRST CURRENT_TIMESTAMP CURRENT_TIMEZONE CURRENT_TIMEZONE_ID DATE_BUCKET DATEADD DATEDIFF DATEDIFF_BIG DATEFROMPARTS DATENAME DATEPART DATETIME2FROMPARTS DATETIMEFROMPARTS DATETIMEOFFSETFROMPARTS DATETRUNC DAY EOMONTH GETDATE GETUTCDATE ISDATE MONTH SMALLDATETIMEFROMPARTS SWITCHOFFSET SYSDATETIME SYSDATETIMEOFFSET SYSUTCDATETIME TIMEFROMPARTS TODATETIMEOFFSET YEAR" +
+  /* Fuzzy string match https://learn.microsoft.com/en-us/sql/t-sql/functions/edit-distance-transact-sql?view=sql-server-ver17 */
+  "EDIT_DISTANCE EDIT_DISTANCE_SIMILARITY JARO_WINKLER_DISTANCE JARO_WINKLER_SIMILARITY" +
+  /* Graph https://learn.microsoft.com/en-us/sql/t-sql/functions/graph-functions-transact-sql?view=sql-server-ver17*/
+  "EDGE_ID_FROM_PARTS GRAPH_ID_FROM_EDGE_ID GRAPH_ID_FROM_NODE_ID NODE_ID_FROM_PARTS OBJECT_ID_FROM_EDGE_ID OBJECT_ID_FROM_NODE_ID" +
+  /* JSON https://learn.microsoft.com/en-us/sql/t-sql/functions/json-functions-transact-sql?view=sql-server-ver17 */
+  "JSON ISJSON JSON_ARRAY JSON_CONTAINS JSON_MODIFY JSON_OBJECT JSON_PATH_EXISTS JSON_QUERY JSON_VALUE" +
+  /* Regular Expressions https://learn.microsoft.com/en-us/sql/t-sql/functions/regular-expressions-functions-transact-sql?view=sql-server-ver17 */
+  "REGEXP_LIKE REGEXP_REPLACE REGEXP_SUBSTR REGEXP_INSTR REGEXP_COUNT REGEXP_MATCHES REGEXP_SPLIT_TO_TABLE"+ 
+  /* Mathematical https://learn.microsoft.com/en-us/sql/t-sql/functions/mathematical-functions-transact-sql?view=sql-server-ver17 */
+  "ABS ACOS ASIN ATAN ATN2 CEILING COS COT DEGREES EXP FLOOR LOG LOG10 PI POWER RADIANS RAND ROUND SIGN SIN SQRT SQUARE TAN" +
+  /* Logical https://learn.microsoft.com/en-us/sql/t-sql/functions/logical-functions-choose-transact-sql?view=sql-server-ver17*/ 
+  "CHOOSE GREATEST IIF LEAST" +
+  /* Metadata https://learn.microsoft.com/en-us/sql/t-sql/functions/metadata-functions-transact-sql?view=sql-server-ver17 */
+  "@@PROCID APP_NAME APPLOCK_MODE APPLOCK_TEST ASSEMBLYPROPERTY COL_LENGTH COL_NAME COLUMNPROPERTY DATABASEPROPERTYEX DB_ID DB_NAME FILE_ID FILE_IDEX FILE_NAME FILEGROUP_ID FILEGROUP_NAME FILEGROUPPROPERTY FILEPROPERTY FILEPROPERTYEX FULLTEXTCATALOGPROPERTY FULLTEXTSERVICEPROPERTY INDEX_COL INDEXKEY_PROPERTY INDEXPROPERTY NEXT VALUE FOR OBJECT_DEFINITION OBJECT_ID OBJECT_NAME OBJECT_SCHEMA_NAME OBJECTPROPERTY OBJECTPROPERTYEX ORIGINAL_DB_NAME PARSENAME SCHEMA_ID SCHEMA_NAME SCOPE_IDENTITY SERVERPROPERTY STATS_DATE TYPE_ID TYPE_NAME TYPEPROPERTY" +
+  /* Ranking https://learn.microsoft.com/en-us/sql/t-sql/functions/ranking-functions-transact-sql?view=sql-server-ver17 */
+  "DENSE_RANK NTILE RANK ROW_NUMBER" +
+  /* Replication https://learn.microsoft.com/en-us/sql/t-sql/functions/replication-functions-publishingservername?view=sql-server-ver17 */
+  "PUBLISHINGSERVERNAME" +
+  /* Security https://learn.microsoft.com/en-us/sql/t-sql/functions/security-functions-transact-sql?view=sql-server-ver17 */
+  "CERTENCODED CERTPRIVATEKEY CURRENT_USER DATABASE_PRINCIPAL_ID HAS_DBACCESS HAS_PERMS_BY_NAME IS_MEMBER IS_ROLEMEMBER IS_SRVROLEMEMBER LOGINPROPERTY ORIGINAL_LOGIN PERMISSIONS PWDENCRYPT PWDCOMPARE SESSION_USER SESSIONPROPERTY SUSER_ID SUSER_NAME SUSER_SID SUSER_SNAME SYSTEM_USER USER USER_ID USER_NAME" +
+  /* String https://learn.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql?view=sql-server-ver17*/
+  "ASCII CHAR CHARINDEX CONCAT CONCAT_WS DIFFERENCE FORMAT LEFT LEN LOWER LTRIM NCHAR PATINDEX QUOTENAME REPLACE REPLICATE REVERSE RIGHT RTRIM SOUNDEX SPACE STR STRING_AGG STRING_ESCAPE STUFF SUBSTRING TRANSLATE TRIM UNICODE UPPER" +
+  /* System https://learn.microsoft.com/en-us/sql/t-sql/functions/system-functions-transact-sql?view=sql-server-ver17 */
+  "$PARTITION @@ERROR @@IDENTITY @@PACK_RECEIVED @@ROWCOUNT @@TRANCOUNT BINARY_CHECKSUM CHECKSUM COMPRESS CONNECTIONPROPERTY CONTEXT_INFO CURRENT_REQUEST_ID CURRENT_TRANSACTION_ID DECOMPRESS ERROR_LINE ERROR_MESSAGE ERROR_NUMBER ERROR_PROCEDURE ERROR_SEVERITY ERROR_STATE FORMATMESSAGE GET_FILESTREAM_TRANSACTION_CONTEXT GETANSINULL HOST_ID HOST_NAME ISNULL ISNUMERIC MIN_ACTIVE_ROWVERSION NEWID NEWSEQUENTIALID ROWCOUNT_BIG SESSION_CONTEXT XACT_STATE" +
+  /* System Statistical https://learn.microsoft.com/en-us/sql/t-sql/functions/system-statistical-functions-transact-sql?view=sql-server-ver17*/
+  "@@CONNECTIONS @@CPU_BUSY @@IDLE @@IO_BUSY @@PACK_SENT @@PACKET_ERRORS @@TIMETICKS @@TOTAL_ERRORS @@TOTAL_READ @@TOTAL_WRITE" +
+  /* Text & Image https://learn.microsoft.com/en-us/sql/t-sql/functions/text-and-image-functions-textptr-transact-sql?view=sql-server-ver17*/
+  "TEXTPTR TEXTVALID" +
+  /* Trigger https://learn.microsoft.com/en-us/sql/t-sql/functions/trigger-functions-transact-sql?view=sql-server-ver17*/
+  "COLUMNS_UPDATED EVENTDATA TRIGGER_NESTLEVEL" +
+  /* Vectors https://learn.microsoft.com/en-us/sql/t-sql/functions/vector-functions-transact-sql?view=sql-server-ver17*/
+  "VECTOR_DISTANCE VECTORPROPERTY VECTOR_SEARCH" +
+  /* Relational operators https://msdn.microsoft.com/en-us/library/ms187957.aspx */
+  "GENERATE_SERIES OPENDATASOURCE OPENJSON OPENQUERY OPENROWSET OPENXML PREDICT STRING_SPLIT" +
+  /* Other */
+  "coalesce nullif apply catch filter force include keep keepfixed modify optimize parameterization parameters partition recompile sequence set"
+);
+
+const MSSQLKeywords = (
+  /* Reserved Keywords https://learn.microsoft.com/en-us/sql/t-sql/language-elements/reserved-keywords-transact-sql?view=sql-server-ver17 */
+  "ADD EXTERNAL PROCEDURE ALL FETCH PUBLIC ALTER FILE RAISERROR AND FILLFACTOR READ ANY FOR READTEXT AS FOREIGN RECONFIGURE ASC FREETEXT REFERENCES AUTHORIZATION FREETEXTTABLE REPLICATION BACKUP FROM RESTORE BEGIN FULL RESTRICT BETWEEN FUNCTION RETURN BREAK GOTO REVERT BROWSE GRANT REVOKE BULK GROUP RIGHT BY HAVING ROLLBACK CASCADE HOLDLOCK ROWCOUNT CASE IDENTITY ROWGUIDCOL CHECK IDENTITY_INSERT RULE CHECKPOINT IDENTITYCOL SAVE CLOSE IF SCHEMA CLUSTERED IN SECURITYAUDIT COALESCE INDEX SELECT COLLATE INNER SEMANTICKEYPHRASETABLE COLUMN INSERT SEMANTICSIMILARITYDETAILSTABLE COMMIT INTERSECT SEMANTICSIMILARITYTABLE COMPUTE INTO SESSION_USER CONSTRAINT IS SET CONTAINS JOIN SETUSER CONTAINSTABLE KEY SHUTDOWN CONTINUE KILL SOME CONVERT LEFT STATISTICS CREATE LIKE SYSTEM_USER CROSS LINENO TABLE CURRENT LOAD TABLESAMPLE CURRENT_DATE MERGE TEXTSIZE CURRENT_TIME NATIONAL THEN CURRENT_TIMESTAMP NOCHECK TO CURRENT_USER NONCLUSTERED TOP CURSOR NOT TRAN DATABASE NULL TRANSACTION DBCC NULLIF TRIGGER DEALLOCATE OF TRUNCATE DECLARE OFF TRY_CONVERT DEFAULT OFFSETS TSEQUAL DELETE ON UNION DENY OPEN UNIQUE DESC OPENDATASOURCE UNPIVOT DISK OPENQUERY UPDATE DISTINCT OPENROWSET UPDATETEXT DISTRIBUTED OPENXML USE DOUBLE OPTION USER DROP OR VALUES DUMP ORDER VARYING ELSE OUTER VIEW END OVER WAITFOR ERRLVL PERCENT WHEN ESCAPE PIVOT WHERE EXCEPT PLAN WHILE EXEC PRECISION WITH EXECUTE PRIMARY WITHIN GROUP EXISTS PRINT WRITETEXT EXIT PROC " +
+  /* Table hints https://learn.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-table?view=sql-server-ver17 */
+  "NOEXPAND INDEX FORCESEEK FORCESCAN HOLDLOCK NOLOCK NOWAIT PAGLOCK READCOMMITTED READCOMMITTEDLOCK READPAST READUNCOMMITTED REPEATABLEREAD ROWLOCK SERIALIZABLE SNAPSHOT SPATIAL_WINDOW_MAX_CELLS TABLOCK TABLOCKX UPDLOCK XLOCK KEEPIDENTITY KEEPDEFAULTS IGNORE_CONSTRAINTS IGNORE_TRIGGERS"
+)
+
 export const MSSQL = SQLDialect.define({
-  keywords: SQLKeywords + "trigger proc view index for add constraint key primary foreign collate clustered nonclustered declare exec go if use index holdlock nolock nowait paglock pivot readcommitted readcommittedlock readpast readuncommitted repeatableread rowlock serializable snapshot tablock tablockx unpivot updlock with",
+  keywords: SQLKeywords + MSSQLKeywords,
   types: SQLTypes + "smalldatetime datetimeoffset datetime2 datetime bigint smallint smallmoney tinyint money real text nvarchar ntext varbinary image hierarchyid uniqueidentifier sql_variant xml",
-  builtin: "binary_checksum checksum connectionproperty context_info current_request_id error_line error_message error_number error_procedure error_severity error_state formatmessage get_filestream_transaction_context getansinull host_id host_name isnull isnumeric min_active_rowversion newid newsequentialid rowcount_big xact_state object_id",
+  builtin: MSSQLBuiltin,
   operatorChars: "*+-%<>!=^&|/",
   specialVar: "@"
 })
