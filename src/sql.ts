@@ -249,66 +249,66 @@ export const MariaSQL = SQLDialect.define({
 
 /// SQL dialect for Microsoft [SQL
 /// Server](https://www.microsoft.com/en-us/sql-server).
-let MSSQLBuiltin = (
+let MSSQLBuiltin = [
   /* Aggregate https://msdn.microsoft.com/en-us/library/ms173454.aspx */
-  "APPROX_COUNT_DISTINCT APPROX_PERCENTILE_CONT APPROX_PERCENTILE_DISC AVG CHECKSUM_AGG COUNT COUNT_BIG GROUPING GROUPING_ID MAX MIN PRODUCT STDEV STDEVP SUM VAR VARP" +
+  "approx_count_distinct approx_percentile_cont approx_percentile_disc avg checksum_agg count count_big grouping grouping_id max min product stdev stdevp sum var varp",
   /* AI https://learn.microsoft.com/en-us/sql/t-sql/functions/ai-functions-transact-sql?view=sql-server-ver17 */
-  "AI_GENERATE_EMBEDDINGS AI_GENERATE_CHUNKS" +
+  "ai_generate_embeddings ai_generate_chunks",
   /* Analytic https://learn.microsoft.com/en-us/sql/t-sql/functions/analytic-functions-transact-sql?view=sql-server-ver17 */
-  "CUME_DIST FIRST_VALUE LAG LAST_VALUE LEAD PERCENTILE_CONT PERCENTILE_DISC PERCENT_RANK" +
+  "cume_dist first_value lag last_value lead percentile_cont percentile_disc percent_rank",
   /* Bit Manipulation https://learn.microsoft.com/en-us/sql/t-sql/functions/bit-manipulation-functions-overview?view=sql-server-ver17 */
-  "LEFT_SHIFT RIGHT_SHIFT BIT_COUNT GET_BIT SET_BIT" +
+  "left_shift right_shift bit_count get_bit set_bit",
   /* Collation Functions https://learn.microsoft.com/en-us/sql/t-sql/functions/collation-functions-collationproperty-transact-sql?view=sql-server-ver17 */
-  "COLLATIONPROPERTY TERTIARY_WEIGHTS" +
+  "collationproperty tertiary_weights",
   /* Configuration https://learn.microsoft.com/en-us/sql/t-sql/functions/configuration-functions-transact-sql?view=sql-server-ver17 */
-  "@@DATEFIRST @@DBTS @@LANGID @@LANGUAGE @@LOCK_TIMEOUT @@MAX_CONNECTIONS @@MAX_PRECISION @@NESTLEVEL @@OPTIONS @@REMSERVER @@SERVERNAME @@SERVICENAME @@SPID @@TEXTSIZE @@VERSION" +
+  "@@datefirst @@dbts @@langid @@language @@lock_timeout @@max_connections @@max_precision @@nestlevel @@options @@remserver @@servername @@servicename @@spid @@textsize @@version",
   /* Conversion https://learn.microsoft.com/en-us/sql/t-sql/functions/conversion-functions-transact-sql?view=sql-server-ver17*/
-  "CAST CONVERT PARSE TRY_CAST TRY_CONVERT TRY_PARSE" +
+  "cast convert parse try_cast try_convert try_parse",
   /* Cryptographic https://learn.microsoft.com/en-us/sql/t-sql/functions/cryptographic-functions-transact-sql?view=sql-server-ver17*/
-  "ASYMKEY_ID ASYMKEYPROPERTY CERTPROPERTY CERT_ID CRYPT_GEN_RANDOM DECRYPTBYASYMKEY DECRYPTBYCERT DECRYPTBYKEY DECRYPTBYKEYAUTOASYMKEY DECRYPTBYKEYAUTOCERT DECRYPTBYPASSPHRASE ENCRYPTBYASYMKEY ENCRYPTBYCERT ENCRYPTBYKEY ENCRYPTBYPASSPHRASE HASHBYTES IS_OBJECTSIGNED KEY_GUID KEY_ID KEY_NAME SIGNBYASYMKEY SIGNBYCERT SYMKEYPROPERTY VERIFYSIGNEDBYCERT VERIFYSIGNEDBYASYMKEY" +
+  "asymkey_id asymkeyproperty certproperty cert_id crypt_gen_random decryptbyasymkey decryptbycert decryptbykey decryptbykeyautoasymkey decryptbykeyautocert decryptbypassphrase encryptbyasymkey encryptbycert encryptbykey encryptbypassphrase hashbytes is_objectsigned key_guid key_id key_name signbyasymkey signbycert symkeyproperty verifysignedbycert verifysignedbyasymkey",
   /* Cursor https://learn.microsoft.com/en-us/sql/t-sql/functions/cursor-functions-transact-sql?view=sql-server-ver17 */
-  "@@CURSOR_ROWS @@FETCH_STATUS CURSOR_STATUS" +
+  "@@cursor_rows @@fetch_status cursor_status",
   /* Data type https://learn.microsoft.com/en-us/sql/t-sql/functions/data-type-functions-transact-sql?view=sql-server-ver17 */
-  "DATALENGTH IDENT_CURRENT IDENT_INCR IDENT_SEED IDENTITY SQL_VARIANT_PROPERTY" +
+  "datalength ident_current ident_incr ident_seed identity sql_variant_property",
   /* Date & time https://learn.microsoft.com/en-us/sql/t-sql/functions/date-and-time-data-types-and-functions-transact-sql?view=sql-server-ver17 */
-  "@@DATEFIRST CURRENT_TIMESTAMP CURRENT_TIMEZONE CURRENT_TIMEZONE_ID DATE_BUCKET DATEADD DATEDIFF DATEDIFF_BIG DATEFROMPARTS DATENAME DATEPART DATETIME2FROMPARTS DATETIMEFROMPARTS DATETIMEOFFSETFROMPARTS DATETRUNC DAY EOMONTH GETDATE GETUTCDATE ISDATE MONTH SMALLDATETIMEFROMPARTS SWITCHOFFSET SYSDATETIME SYSDATETIMEOFFSET SYSUTCDATETIME TIMEFROMPARTS TODATETIMEOFFSET YEAR" +
+  "@@datefirst current_timestamp current_timezone current_timezone_id date_bucket dateadd datediff datediff_big datefromparts datename datepart datetime2fromparts datetimefromparts datetimeoffsetfromparts datetrunc day eomonth getdate getutcdate isdate month smalldatetimefromparts switchoffset sysdatetime sysdatetimeoffset sysutcdatetime timefromparts todatetimeoffset year",
   /* Fuzzy string match https://learn.microsoft.com/en-us/sql/t-sql/functions/edit-distance-transact-sql?view=sql-server-ver17 */
-  "EDIT_DISTANCE EDIT_DISTANCE_SIMILARITY JARO_WINKLER_DISTANCE JARO_WINKLER_SIMILARITY" +
+  "edit_distance edit_distance_similarity jaro_winkler_distance jaro_winkler_similarity",
   /* Graph https://learn.microsoft.com/en-us/sql/t-sql/functions/graph-functions-transact-sql?view=sql-server-ver17*/
-  "EDGE_ID_FROM_PARTS GRAPH_ID_FROM_EDGE_ID GRAPH_ID_FROM_NODE_ID NODE_ID_FROM_PARTS OBJECT_ID_FROM_EDGE_ID OBJECT_ID_FROM_NODE_ID" +
+  "edge_id_from_parts graph_id_from_edge_id graph_id_from_node_id node_id_from_parts object_id_from_edge_id object_id_from_node_id",
   /* JSON https://learn.microsoft.com/en-us/sql/t-sql/functions/json-functions-transact-sql?view=sql-server-ver17 */
-  "JSON ISJSON JSON_ARRAY JSON_CONTAINS JSON_MODIFY JSON_OBJECT JSON_PATH_EXISTS JSON_QUERY JSON_VALUE" +
+  "json isjson json_array json_contains json_modify json_object json_path_exists json_query json_value",
   /* Regular Expressions https://learn.microsoft.com/en-us/sql/t-sql/functions/regular-expressions-functions-transact-sql?view=sql-server-ver17 */
-  "REGEXP_LIKE REGEXP_REPLACE REGEXP_SUBSTR REGEXP_INSTR REGEXP_COUNT REGEXP_MATCHES REGEXP_SPLIT_TO_TABLE"+ 
+  "regexp_like regexp_replace regexp_substr regexp_instr regexp_count regexp_matches regexp_split_to_table",
   /* Mathematical https://learn.microsoft.com/en-us/sql/t-sql/functions/mathematical-functions-transact-sql?view=sql-server-ver17 */
-  "ABS ACOS ASIN ATAN ATN2 CEILING COS COT DEGREES EXP FLOOR LOG LOG10 PI POWER RADIANS RAND ROUND SIGN SIN SQRT SQUARE TAN" +
+  "abs acos asin atan atn2 ceiling cos cot degrees exp floor log log10 pi power radians rand round sign sin sqrt square tan",
   /* Logical https://learn.microsoft.com/en-us/sql/t-sql/functions/logical-functions-choose-transact-sql?view=sql-server-ver17*/ 
-  "CHOOSE GREATEST IIF LEAST" +
+  "choose greatest iif least",
   /* Metadata https://learn.microsoft.com/en-us/sql/t-sql/functions/metadata-functions-transact-sql?view=sql-server-ver17 */
-  "@@PROCID APP_NAME APPLOCK_MODE APPLOCK_TEST ASSEMBLYPROPERTY COL_LENGTH COL_NAME COLUMNPROPERTY DATABASEPROPERTYEX DB_ID DB_NAME FILE_ID FILE_IDEX FILE_NAME FILEGROUP_ID FILEGROUP_NAME FILEGROUPPROPERTY FILEPROPERTY FILEPROPERTYEX FULLTEXTCATALOGPROPERTY FULLTEXTSERVICEPROPERTY INDEX_COL INDEXKEY_PROPERTY INDEXPROPERTY NEXT VALUE FOR OBJECT_DEFINITION OBJECT_ID OBJECT_NAME OBJECT_SCHEMA_NAME OBJECTPROPERTY OBJECTPROPERTYEX ORIGINAL_DB_NAME PARSENAME SCHEMA_ID SCHEMA_NAME SCOPE_IDENTITY SERVERPROPERTY STATS_DATE TYPE_ID TYPE_NAME TYPEPROPERTY" +
+  "@@procid app_name applock_mode applock_test assemblyproperty col_length col_name columnproperty databasepropertyex db_id db_name file_id file_idex file_name filegroup_id filegroup_name filegroupproperty fileproperty filepropertyex fulltextcatalogproperty fulltextserviceproperty index_col indexkey_property indexproperty next value for object_definition object_id object_name object_schema_name objectproperty objectpropertyex original_db_name parsename schema_id schema_name scope_identity serverproperty stats_date type_id type_name typeproperty",
   /* Ranking https://learn.microsoft.com/en-us/sql/t-sql/functions/ranking-functions-transact-sql?view=sql-server-ver17 */
-  "DENSE_RANK NTILE RANK ROW_NUMBER" +
+  "dense_rank ntile rank row_number",
   /* Replication https://learn.microsoft.com/en-us/sql/t-sql/functions/replication-functions-publishingservername?view=sql-server-ver17 */
-  "PUBLISHINGSERVERNAME" +
+  "publishingservername",
   /* Security https://learn.microsoft.com/en-us/sql/t-sql/functions/security-functions-transact-sql?view=sql-server-ver17 */
-  "CERTENCODED CERTPRIVATEKEY CURRENT_USER DATABASE_PRINCIPAL_ID HAS_DBACCESS HAS_PERMS_BY_NAME IS_MEMBER IS_ROLEMEMBER IS_SRVROLEMEMBER LOGINPROPERTY ORIGINAL_LOGIN PERMISSIONS PWDENCRYPT PWDCOMPARE SESSION_USER SESSIONPROPERTY SUSER_ID SUSER_NAME SUSER_SID SUSER_SNAME SYSTEM_USER USER USER_ID USER_NAME" +
+  "certenclosed certprivatekey current_user database_principal_id has_dbaccess has_perms_by_name is_member is_rolemember is_srvrolemember loginproperty original_login permissions pwdencrypt pwdcompare session_user sessionproperty suser_id suser_name suser_sid suser_sname system_user user user_id user_name",
   /* String https://learn.microsoft.com/en-us/sql/t-sql/functions/string-functions-transact-sql?view=sql-server-ver17*/
-  "ASCII CHAR CHARINDEX CONCAT CONCAT_WS DIFFERENCE FORMAT LEFT LEN LOWER LTRIM NCHAR PATINDEX QUOTENAME REPLACE REPLICATE REVERSE RIGHT RTRIM SOUNDEX SPACE STR STRING_AGG STRING_ESCAPE STUFF SUBSTRING TRANSLATE TRIM UNICODE UPPER" +
+  "ascii char charindex concat concat_ws difference format left len lower ltrim nchar patindex quotename replace replicate reverse right rtrim soundex space str string_agg string_escape stuff substring translate trim unicode upper",
   /* System https://learn.microsoft.com/en-us/sql/t-sql/functions/system-functions-transact-sql?view=sql-server-ver17 */
-  "$PARTITION @@ERROR @@IDENTITY @@PACK_RECEIVED @@ROWCOUNT @@TRANCOUNT BINARY_CHECKSUM CHECKSUM COMPRESS CONNECTIONPROPERTY CONTEXT_INFO CURRENT_REQUEST_ID CURRENT_TRANSACTION_ID DECOMPRESS ERROR_LINE ERROR_MESSAGE ERROR_NUMBER ERROR_PROCEDURE ERROR_SEVERITY ERROR_STATE FORMATMESSAGE GET_FILESTREAM_TRANSACTION_CONTEXT GETANSINULL HOST_ID HOST_NAME ISNULL ISNUMERIC MIN_ACTIVE_ROWVERSION NEWID NEWSEQUENTIALID ROWCOUNT_BIG SESSION_CONTEXT XACT_STATE" +
+  "$partition @@error @@identity @@pack_received @@rowcount @@trancount binary_checksum checksum compress connectionproperty context_info current_request_id current_transaction_id decompress error_line error_message error_number error_procedure error_severity error_state formatmessage get_filestream_transaction_context getansinull host_id host_name isnull isnumeric min_active_rowversion newid newsequentialid rowcount_big session_context xact_state",
   /* System Statistical https://learn.microsoft.com/en-us/sql/t-sql/functions/system-statistical-functions-transact-sql?view=sql-server-ver17*/
-  "@@CONNECTIONS @@CPU_BUSY @@IDLE @@IO_BUSY @@PACK_SENT @@PACKET_ERRORS @@TIMETICKS @@TOTAL_ERRORS @@TOTAL_READ @@TOTAL_WRITE" +
+  "@@connections @@cpu_busy @@idle @@io_busy @@pack_sent @@packet_errors @@timeticks @@total_errors @@total_read @@total_write",
   /* Text & Image https://learn.microsoft.com/en-us/sql/t-sql/functions/text-and-image-functions-textptr-transact-sql?view=sql-server-ver17*/
-  "TEXTPTR TEXTVALID" +
+  "textptr textvalid",
   /* Trigger https://learn.microsoft.com/en-us/sql/t-sql/functions/trigger-functions-transact-sql?view=sql-server-ver17*/
-  "COLUMNS_UPDATED EVENTDATA TRIGGER_NESTLEVEL" +
+  "columns_updated eventdata trigger_nestlevel",
   /* Vectors https://learn.microsoft.com/en-us/sql/t-sql/functions/vector-functions-transact-sql?view=sql-server-ver17*/
-  "VECTOR_DISTANCE VECTORPROPERTY VECTOR_SEARCH" +
+  "vector_distance vectorproperty vector_search",
   /* Relational operators https://msdn.microsoft.com/en-us/library/ms187957.aspx */
-  "GENERATE_SERIES OPENDATASOURCE OPENJSON OPENQUERY OPENROWSET OPENXML PREDICT STRING_SPLIT" +
+  "generate_series opendatasource openjson openquery openrowset openxml predict string_split",
   /* Other */
   "coalesce nullif apply catch filter force include keep keepfixed modify optimize parameterization parameters partition recompile sequence set"
-);
+].join(' ');
 
 const MSSQLKeywords = (
   /* Reserved Keywords https://learn.microsoft.com/en-us/sql/t-sql/language-elements/reserved-keywords-transact-sql?view=sql-server-ver17 */
