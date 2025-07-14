@@ -212,6 +212,6 @@ export function completeKeywords(keywords: {[name: string]: number}, upperCase: 
                                  build: (name: string, type: string) => Completion) {
   let completions =  Object.keys(keywords)
     .map(keyword => build(upperCase ? keyword.toUpperCase() : keyword, completionType(keywords[keyword])))
-  return ifNotIn(["QuotedIdentifier", "SpecialVar", "String", "LineComment", "BlockComment", "."],
+  return ifNotIn(["QuotedIdentifier", "String", "LineComment", "BlockComment", "."],
                  completeFromList(completions))
 }
