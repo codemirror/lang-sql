@@ -1,3 +1,11 @@
+## 6.9.1 (2025-07-28)
+
+### Bug fixes
+
+Include more MSSQL keyboards and builtins in the completions.
+
+Allow built-in special variables for a dialect to be completed.
+
 ## 6.9.0 (2025-05-30)
 
 ### New features
