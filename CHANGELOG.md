@@ -1,3 +1,9 @@
+## 6.10.0 (2025-09-16)
+
+### New features
+
+Allow `[` in `identifierQuotes` for MSSQL-style bracketed identifiers.
+
 ## 6.9.1 (2025-07-28)
 
 ### Bug fixes
