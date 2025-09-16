@@ -212,8 +212,7 @@ export function completeFromSchema(schema: SQLNamespace,
         options: maybeQuoteCompletions(openingQuote, closingQuote, options),
         validFor: QuotedSpan,
       }
-    }
-    else {
+    } else {
       return {
         from,
         options: options,
