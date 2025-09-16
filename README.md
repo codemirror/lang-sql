@@ -84,9 +84,8 @@ completed directly at the top level.</p>
 
 </dd>
 <dt id="user-content-sqlnamespace">
-  <code>
-    type
-    <strong><a href="#user-content-sqlnamespace">SQLNamespace</a></strong> = <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>&lt;<a href="#user-content-sqlnamespace">SQLNamespace</a>&gt; | {self: <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>, children: <a href="#user-content-sqlnamespace">SQLNamespace</a>} | readonly (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>)[]</code>
+  <code>type</code>
+  <code><strong><a href="#user-content-sqlnamespace">SQLNamespace</a></strong> = <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>&lt;<a href="#user-content-sqlnamespace">SQLNamespace</a>&gt; | {self: <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>, children: <a href="#user-content-sqlnamespace">SQLNamespace</a>} | readonly (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://codemirror.net/docs/ref#autocomplete.Completion">Completion</a>)[]</code>
 </dt>
 
 <dd><p>The type used to describe a level of the schema for
@@ -115,6 +114,11 @@ completion option to use for its parent property, when the default option
   <code><strong><a href="#user-content-sqldialect.extension">extension</a></strong>: <a href="https://codemirror.net/docs/ref#state.Extension">Extension</a></code></dt>
 
 <dd><p>Returns the language for this dialect as an extension.</p>
+</dd><dt id="user-content-sqldialect.configurelanguage">
+  <code><strong><a href="#user-content-sqldialect.configurelanguage">configureLanguage</a></strong>(<a id="user-content-sqldialect.configurelanguage^options" href="#user-content-sqldialect.configurelanguage^options">options</a>: <a href="https://lezer.codemirror.net/docs/ref/#lr.ParserConfig">ParserConfig</a>, <a id="user-content-sqldialect.configurelanguage^name" href="#user-content-sqldialect.configurelanguage^name">name</a>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>) → <a href="#user-content-sqldialect">SQLDialect</a></code></dt>
+
+<dd><p>Reconfigure the parser used by this dialect. Returns a new
+dialect object.</p>
 </dd><dt id="user-content-sqldialect^define">
   <code>static <strong><a href="#user-content-sqldialect^define">define</a></strong>(<a id="user-content-sqldialect^define^spec" href="#user-content-sqldialect^define^spec">spec</a>: <a href="#user-content-sqldialectspec">SQLDialectSpec</a>) → <a href="#user-content-sqldialect">SQLDialect</a></code></dt>
 
@@ -191,7 +195,7 @@ Defaults to <code>&quot;?&quot;</code>.</p>
   <code><strong><a href="#user-content-sqldialectspec.identifierquotes">identifierQuotes</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dt>
 
 <dd><p>The characters that can be used to quote identifiers. Defaults
-to <code>&quot;\&quot;&quot;</code>.</p>
+to <code>&quot;\&quot;&quot;</code>. Add <code>[</code> for MSSQL-style bracket quoted identifiers.</p>
 </dd><dt id="user-content-sqldialectspec.caseinsensitiveidentifiers">
   <code><strong><a href="#user-content-sqldialectspec.caseinsensitiveidentifiers">caseInsensitiveIdentifiers</a></strong>&#8288;?: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></code></dt>
 
