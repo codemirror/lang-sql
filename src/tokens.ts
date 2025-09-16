@@ -269,6 +269,10 @@ export function tokensFor(d: Dialect) {
       input.advance(2)
       readPLSQLQuotedLiteral(input, openDelim)
       input.acceptToken(StringToken)
+    } else if (inString(next, d.identifierQuotes)) {
+      const endQuote = next == Ch.BracketL ? Ch.BracketR : next
+      readLiteral(input, endQuote, false)
+      input.acceptToken(QuotedIdentifier)
     } else if (next == Ch.ParenL) {
       input.acceptToken(ParenL)
     } else if (next == Ch.ParenR) {
@@ -319,9 +323,6 @@ export function tokensFor(d: Dialect) {
       if (input.next == next) input.advance()
       readWordOrQuoted(input)
       input.acceptToken(SpecialVar)
-    } else if (inString(next, d.identifierQuotes)) {
-      readLiteral(input, next, false)
-      input.acceptToken(QuotedIdentifier)
     } else if (next == Ch.Colon || next == Ch.Comma) {
       input.acceptToken(Punctuation)
     } else if (isAlpha(next)) {

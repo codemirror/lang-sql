@@ -13,7 +13,7 @@ function tokenBefore(tree: SyntaxNode) {
 
 function idName(doc: Text, node: SyntaxNode): string {
   let text = doc.sliceString(node.from, node.to)
-  let quoted = /^([`'"])(.*)\1$/.exec(text)
+  let quoted = /^([`'"\[])(.*)([`'"\]])$/.exec(text)
   return quoted ? quoted[2] : text
 }
 
@@ -86,12 +86,11 @@ function getAliases(doc: Text, at: SyntaxNode) {
   return aliases
 }
 
-function maybeQuoteCompletions(quote: string | null, completions: readonly Completion[]) {
-  if (!quote) return completions
-  return completions.map(c => ({...c, label: c.label[0] == quote ? c.label : quote + c.label + quote, apply: undefined}))
+function maybeQuoteCompletions(openingQuote: string, closingQuote: string, completions: readonly Completion[]) {
+  return completions.map(c => ({...c, label: c.label[0] == openingQuote ? c.label : openingQuote + c.label + closingQuote, apply: undefined}))
 }
 
-const Span = /^\w*$/, QuotedSpan = /^[`'"]?\w*[`'"]?$/
+const Span = /^\w*$/, QuotedSpan = /^[`'"\[]?\w*[`'"\]]?$/
 
 function isSelfTag(namespace: SQLNamespace): namespace is {self: Completion, children: SQLNamespace} {
   return (namespace as any).self && typeof (namespace as any).self.label == "string"
@@ -156,7 +155,12 @@ class CompletionLevel {
 
 function nameCompletion(label: string, type: string, idQuote: string, idCaseInsensitive: boolean): Completion {
   if ((new RegExp("^[a-z_][a-z_\\d]*$", idCaseInsensitive ? "i" : "")).test(label)) return {label, type}
-  return {label, type, apply: idQuote + label + idQuote}
+
+  return {label, type, apply: idQuote + label + getClosingQuote(idQuote)}
+}
+
+function getClosingQuote(openingQuote: string) {
+  return openingQuote === "[" ? "]" : openingQuote;
 }
 
 // Some of this is more gnarly than it has to be because we're also
@@ -191,15 +195,29 @@ export function completeFromSchema(schema: SQLNamespace,
       if (!next) return null
       level = next
     }
-    let quoteAfter = quoted && context.state.sliceDoc(context.pos, context.pos + 1) == quoted
+
     let options = level.list
     if (level == top && aliases)
       options = options.concat(Object.keys(aliases).map(name => ({label: name, type: "constant"})))
-    return {
-      from,
-      to: quoteAfter ? context.pos + 1 : undefined,
-      options: maybeQuoteCompletions(quoted, options),
-      validFor: quoted ? QuotedSpan : Span
+
+    if (quoted) {
+      let openingQuote = quoted[0]
+      let closingQuote = getClosingQuote(openingQuote);
+
+      let quoteAfter = context.state.sliceDoc(context.pos, context.pos + 1) == closingQuote
+
+      return {
+        from,
+        to: quoteAfter ? context.pos + 1 : undefined,
+        options: maybeQuoteCompletions(openingQuote, closingQuote, options),
+        validFor: QuotedSpan,
+      }
+    } else {
+      return {
+        from,
+        options: options,
+        validFor: Span
+      }
     }
   }
 }

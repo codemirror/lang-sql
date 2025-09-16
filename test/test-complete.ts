@@ -1,6 +1,6 @@
 import {EditorState} from "@codemirror/state"
 import {CompletionContext, CompletionResult, CompletionSource} from "@codemirror/autocomplete"
-import {schemaCompletionSource, keywordCompletionSource, PostgreSQL, MySQL, SQLConfig, SQLDialect} from "@codemirror/lang-sql"
+import {schemaCompletionSource, keywordCompletionSource, PostgreSQL, MySQL, SQLConfig, SQLDialect, MSSQL} from "@codemirror/lang-sql"
 import ist from "ist"
 
 function get(doc: string, conf: SQLConfig & {explicit?: boolean, keywords?: boolean} = {}) {
@@ -94,6 +94,11 @@ describe("SQL completion", () => {
     ist(str(get('select "other"."users"."|', {schema: schema2})), '"id", "name"')
   })
 
+  it("completes column names in bracket quoted tables with MSSQL", () => {
+    ist(str(get("select [public].[users].|", {schema: schema2, dialect: MSSQL})), "email, id")
+    ist(str(get("select [other].[users].|", {schema: schema2, dialect: MSSQL})), "id, name")
+  })
+
   it("completes column names of aliased tables", () => {
     ist(str(get("select u.| from users u", {schema: schema1})), "address, id, name")
     ist(str(get("select u.| from users as u", {schema: schema1})), "address, id, name")
@@ -126,6 +131,11 @@ describe("SQL completion", () => {
     ist(str(get('select a| from a.b as ab join auto au', {schema: schema2})), "ab, au, other, public")
   })
 
+  it("completes bracket quoted aliases with MSSQL", () => {
+    ist(str(get("select u.| from public.users [u]", {schema: schema2, dialect: MSSQL})), "email, id")
+    ist(str(get("select [u].| from public.users u", {schema: schema2, dialect: MSSQL})), "email, id")
+  })
+
   it("includes closing quote in completion", () => {
     let r = get('select "u|"', {schema: schema1})
     ist(r!.to, 10)
@@ -147,6 +157,7 @@ describe("SQL completion", () => {
 
   it("supports alternate quoting styles", () => {
     ist(str(get("select `u|", {dialect: MySQL, schema: schema1})), "`products`, `users`")
+    ist(str(get("select [u|", {dialect: MSSQL, schema: schema1})), "[products], [users]")
   })
 
   it("doesn't complete without identifier", () => {
@@ -171,6 +182,13 @@ describe("SQL completion", () => {
     const customDialect = SQLDialect.define({...PostgreSQL.spec, caseInsensitiveIdentifiers: true})
     ist(str(get("foo.c|", {schema: {foo: ["Column", "cell"]}, dialect: customDialect})),
         'Column, cell')
+  })
+
+  it("can add MSSQL-style brackets as identifier quotes", () => {
+    let dialect = SQLDialect.define({...MSSQL.spec, identifierQuotes: '['});
+    let config = { schema: {"Foo": ["Bar"]}, dialect: dialect };
+
+    ist(str(get("[Foo].b|", config)), "[Bar]");
   })
 
   it("supports nesting more than two deep", () => {
