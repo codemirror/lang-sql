@@ -170,7 +170,6 @@ export interface Dialect {
   identifierQuotes: string,
   caseInsensitiveIdentifiers: boolean,
   words: {[name: string]: number},
-  mssqlBracketQuotingMechanism: boolean,
 }
 
 export const SQLTypes = "array binary bit boolean char character clob date decimal double float int integer interval large national nchar nclob numeric object precision real smallint time timestamp varchar varying "
@@ -192,7 +191,6 @@ const defaults: Dialect = {
   identifierQuotes: '"',
   caseInsensitiveIdentifiers: false,
   words: keywords(SQLKeywords, SQLTypes),
-  mssqlBracketQuotingMechanism: false,
 }
 
 export function dialect(spec: Partial<Dialect>, kws?: string, types?: string, builtin?: string): Dialect {
@@ -271,8 +269,9 @@ export function tokensFor(d: Dialect) {
       input.advance(2)
       readPLSQLQuotedLiteral(input, openDelim)
       input.acceptToken(StringToken)
-    } else if (d.mssqlBracketQuotingMechanism && next == Ch.BracketL) {
-      readLiteral(input, Ch.BracketR, false)
+    } else if (inString(next, d.identifierQuotes)) {
+      const endQuote = next == Ch.BracketL ? Ch.BracketR : next
+      readLiteral(input, endQuote, false)
       input.acceptToken(QuotedIdentifier)
     } else if (next == Ch.ParenL) {
       input.acceptToken(ParenL)
@@ -324,9 +323,6 @@ export function tokensFor(d: Dialect) {
       if (input.next == next) input.advance()
       readWordOrQuoted(input)
       input.acceptToken(SpecialVar)
-    } else if (inString(next, d.identifierQuotes)) {
-      readLiteral(input, next, false)
-      input.acceptToken(QuotedIdentifier)
     } else if (next == Ch.Colon || next == Ch.Comma) {
       input.acceptToken(Punctuation)
     } else if (isAlpha(next)) {
