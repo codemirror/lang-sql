@@ -160,7 +160,7 @@ function nameCompletion(label: string, type: string, idQuote: string, idCaseInse
 }
 
 function getClosingQuote(openingQuote: string) {
-  return openingQuote === "[" ? "]" : openingQuote;
+  return openingQuote === "[" ? "]" : openingQuote
 }
 
 // Some of this is more gnarly than it has to be because we're also
@@ -202,7 +202,7 @@ export function completeFromSchema(schema: SQLNamespace,
 
     if (quoted) {
       let openingQuote = quoted[0]
-      let closingQuote = getClosingQuote(openingQuote);
+      let closingQuote = getClosingQuote(openingQuote)
 
       let quoteAfter = context.state.sliceDoc(context.pos, context.pos + 1) == closingQuote
 

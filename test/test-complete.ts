@@ -185,10 +185,10 @@ describe("SQL completion", () => {
   })
 
   it("can add MSSQL-style brackets as identifier quotes", () => {
-    let dialect = SQLDialect.define({...MSSQL.spec, identifierQuotes: '['});
-    let config = { schema: {"Foo": ["Bar"]}, dialect: dialect };
+    let dialect = SQLDialect.define({...MSSQL.spec, identifierQuotes: '['})
+    let config = { schema: {"Foo": ["Bar"]}, dialect: dialect }
 
-    ist(str(get("[Foo].b|", config)), "[Bar]");
+    ist(str(get("[Foo].b|", config)), "[Bar]")
   })
 
   it("supports nesting more than two deep", () => {
