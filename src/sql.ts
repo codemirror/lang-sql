@@ -75,7 +75,7 @@ export type SQLDialectSpec = {
   /// Defaults to `"?"`.
   specialVar?: string,
   /// The characters that can be used to quote identifiers. Defaults
-  /// to `"\""`.
+  /// to `"\""`. Set to "[" to quote with brackets (MSSQL)
   identifierQuotes?: string
   /// Controls whether identifiers are case-insensitive. Identifiers
   /// with upper-case letters are quoted when set to false (which is
@@ -87,6 +87,8 @@ export type SQLDialectSpec = {
   /// Controls whether bit values can contain other characters than 0 and 1.
   /// Defaults to false.
   treatBitsAsBytes?: boolean,
+  /// Enables recognition of syntax like `[My Table]` as quoted identifiers
+  mssqlBracketQuotingMechanism?: boolean
 }
 
 /// Represents an SQL dialect.
@@ -318,7 +320,8 @@ export const MSSQL = SQLDialect.define({
   types: SQLTypes + "smalldatetime datetimeoffset datetime2 datetime bigint smallint smallmoney tinyint money real text nvarchar ntext varbinary image hierarchyid uniqueidentifier sql_variant xml",
   builtin: MSSQLBuiltin,
   operatorChars: "*+-%<>!=^&|/",
-  specialVar: "@"
+  specialVar: "@",
+  mssqlBracketQuotingMechanism: true
 })
 
 /// [SQLite](https://sqlite.org/) dialect.

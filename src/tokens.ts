@@ -169,7 +169,8 @@ export interface Dialect {
   specialVar: string,
   identifierQuotes: string,
   caseInsensitiveIdentifiers: boolean,
-  words: {[name: string]: number}
+  words: {[name: string]: number},
+  mssqlBracketQuotingMechanism: boolean,
 }
 
 export const SQLTypes = "array binary bit boolean char character clob date decimal double float int integer interval large national nchar nclob numeric object precision real smallint time timestamp varchar varying "
@@ -190,7 +191,8 @@ const defaults: Dialect = {
   specialVar: "?",
   identifierQuotes: '"',
   caseInsensitiveIdentifiers: false,
-  words: keywords(SQLKeywords, SQLTypes)
+  words: keywords(SQLKeywords, SQLTypes),
+  mssqlBracketQuotingMechanism: false,
 }
 
 export function dialect(spec: Partial<Dialect>, kws?: string, types?: string, builtin?: string): Dialect {
@@ -269,6 +271,9 @@ export function tokensFor(d: Dialect) {
       input.advance(2)
       readPLSQLQuotedLiteral(input, openDelim)
       input.acceptToken(StringToken)
+    } else if (d.mssqlBracketQuotingMechanism && next == Ch.BracketL) {
+      readLiteral(input, Ch.BracketR, false)
+      input.acceptToken(QuotedIdentifier)
     } else if (next == Ch.ParenL) {
       input.acceptToken(ParenL)
     } else if (next == Ch.ParenR) {

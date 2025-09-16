@@ -1,5 +1,5 @@
 import ist from "ist"
-import {PostgreSQL, MySQL, PLSQL, SQLDialect} from "@codemirror/lang-sql"
+import {PostgreSQL, MySQL, PLSQL, SQLDialect, MSSQL} from "@codemirror/lang-sql"
 
 const mysqlTokens = MySQL.language
 const postgresqlTokens = PostgreSQL.language
@@ -7,6 +7,7 @@ const bigQueryTokens = SQLDialect.define({
   treatBitsAsBytes: true
 }).language
 const plsqlTokens = PLSQL.language
+const mssqlTokens = MSSQL.language
 
 describe("Parse MySQL tokens", () => {
   const parser = mysqlTokens.parser
@@ -89,5 +90,13 @@ describe("Parse PL/SQL tokens", () => {
 
   it("parses alternative quoting mechanism - unclosed", () => {
     ist(parser.parse("SELECT q'~foo'bar' FROM DUAL"), 'Script(Statement(Keyword,String))')
+  })
+})
+
+describe("Parse MSSQL tokens", () => {
+  const parser = mssqlTokens.parser;
+
+  it("parses brackets as QuotedIdentifier", () => {
+    ist(parser.parse("SELECT * FROM [tblTest]"), "Script(Statement(Keyword,Operator,Keyword,QuotedIdentifier))")
   })
 })
