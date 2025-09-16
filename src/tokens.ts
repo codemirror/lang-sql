@@ -169,7 +169,7 @@ export interface Dialect {
   specialVar: string,
   identifierQuotes: string,
   caseInsensitiveIdentifiers: boolean,
-  words: {[name: string]: number},
+  words: {[name: string]: number}
 }
 
 export const SQLTypes = "array binary bit boolean char character clob date decimal double float int integer interval large national nchar nclob numeric object precision real smallint time timestamp varchar varying "
@@ -190,7 +190,7 @@ const defaults: Dialect = {
   specialVar: "?",
   identifierQuotes: '"',
   caseInsensitiveIdentifiers: false,
-  words: keywords(SQLKeywords, SQLTypes),
+  words: keywords(SQLKeywords, SQLTypes)
 }
 
 export function dialect(spec: Partial<Dialect>, kws?: string, types?: string, builtin?: string): Dialect {
