@@ -38,6 +38,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/codemirror/lang-sql.git"
+    "url": "git+https://github.com/codemirror/lang-sql.git"
   }
 }
