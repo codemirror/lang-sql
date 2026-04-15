@@ -1,3 +1,5 @@
+**This repository has moved to https://code.haverbeke.berlin/codemirror/lang-sql**
+
 <!-- NOTE: README.md is generated from src/README.md -->
 
 # @codemirror/lang-sql [![NPM version](https://img.shields.io/npm/v/@codemirror/lang-sql.svg)](https://www.npmjs.org/package/@codemirror/lang-sql)
